@@ -1,18 +1,17 @@
-# Entertainment Web App 🎬
+# Entertainment Web App
 
 ## Overview
 
-This project is a modern, responsive entertainment web application built with React and TypeScript, leveraging Supabase for backend services including authentication and data storage. Users can browse a wide variety of movies and TV series, discover trending content, and manage their personal bookmarks.
+Entertainment Web App is a high-performance, media-catalog platform built with **TypeScript** and **React 19**. It provides users with a comprehensive interface to discover movies and TV series, featuring secure authentication and a personalized bookmarking system integrated with **Supabase**.
 
 ## Features
 
-- **User Authentication**: Secure sign-up and login functionality powered by Supabase Auth.
-- **Content Browsing**: Explore an extensive catalog of movies and TV series categorized for easy navigation.
-- **Trending Section**: Stay updated with the most popular and currently trending entertainment.
-- **Search Functionality**: Efficiently search for specific titles across the entire content library.
-- **Bookmark Management**: Easily bookmark favorite movies and TV series for quick access later.
-- **Responsive Design**: A seamless user experience across various devices and screen sizes, implemented with Tailwind CSS.
-- **Robust Data Fetching**: Utilizes React Query for efficient data management, caching, and state synchronization.
+- **User Authentication**: Secure sign-up and login functionality powered by Supabase Auth, including persistent sessions.
+- **Dynamic Content Discovery**: A multi-category catalog for Movies and TV Series with real-time data fetching.
+- **Advanced Search**: A global search system that filters content dynamically based on the user's current view.
+- **Personalized Bookmarking**: Users can save content to a private list, with state synchronized via TanStack Query.
+- **Responsive Media UI**: A mobile-first design featuring trending carousels, movie previews, and interactive video embeds.
+- **Optimized Performance**: Uses Vite for fast builds and TanStack Query for efficient server-state management and caching.
 
 ## Getting Started
 
@@ -20,80 +19,54 @@ To get this project up and running on your local machine, follow these simple st
 
 ### Installation
 
-🚀 **Clone the Repository:**
-
-```bash
-git clone https://github.com/Isaacayomi/Entertainment-web-app.git
-```
-
-📦 **Navigate to Project Directory:**
-
-```bash
-cd entertainment-web-app
-```
-
-⚙️ **Install Dependencies:**
-
-```bash
-npm install
-# or
-yarn install
-```
+1. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/Isaacayomi/Entertainment-web-app.git
+   ```
+2. **Navigate to the directory**:
+   ```bash
+   cd Entertainment-web-app
+   ```
+3. **Install Dependencies**:
+   ```bash
+   npm install
+   ```
+4. **Start the Development Server**:
+   ```bash
+   npm run dev
+   ```
 
 ### Environment Variables
 
-This project uses Supabase for its backend services. You'll need to configure your Supabase project URL and public API key.
+To run this project, you will need to create a `.env` file in your root directory and add your Supabase credentials. Use the following structure:
 
-Create a `.env` file in the root of your project and add the following variables:
-
+```env
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
-VITE_SUPABASE_URL="YOUR_SUPABASE_PROJECT_URL"
-VITE_SUPABASE_ANON_KEY="YOUR_SUPABASE_ANON_KEY"
-```
-
-- `VITE_SUPABASE_URL`: Your Supabase project URL (e.g., `https://abcdefg1234.supabase.co`).
-- `VITE_SUPABASE_ANON_KEY`: Your Supabase public "anon" key.
-
-**Note**: Ensure your Supabase `catalog` table is set up with appropriate RLS (Row Level Security) policies to allow authenticated users to read and update `isBookmarked` status. Also, set up authentication via email/password in your Supabase project.
-
-### Running the Application
-
-Once the dependencies are installed and environment variables are set, you can start the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-```
-
-The application will typically be available at `http://localhost:5173`.
 
 ## Usage
 
-Upon launching the application, you will be greeted by the login/sign-up page.
+The application is structured to provide a fluid user experience from authentication to content consumption:
 
-1.  **Sign Up**: If you are a new user, navigate to the "Sign up" page, provide your email and password to create an account.
-2.  **Login**: Once registered, log in with your credentials.
-3.  **Browse Content**: After logging in, you'll land on the homepage, which displays trending content and recommended movies and TV series.
-4.  **Navigation**: Use the sidebar/navbar to switch between "Home", "Movies", "TV Series", and "Bookmarked" content.
-5.  **Search**: Use the search bar at the top to find specific titles.
-6.  **Bookmark**: Click the bookmark icon on any movie or TV series card to add or remove it from your bookmarked list.
+1.  **Authentication**: Start by creating an account on the Sign-Up page. Once registered, log in to access the protected dashboard.
+2.  **Dashboard**: The Home view presents a trending carousel and recommended titles. You can navigate through the sidebar to filter specifically for "Movies" or "TV Series".
+3.  **Search**: Use the top search bar to find titles. The system is context-aware; searching while in the "Movies" tab will prioritize movie results.
+4.  **Bookmarking**: Click the bookmark icon on any media card. These items are instantly added to your "Bookmarks" tab for quick access.
+5.  **Interactive Previews**: Hover over a card and click "Play" to open a modal with detailed information and a video preview (where available).
 
 ## Technologies Used
 
-| Technology           | Description                                                            |
-| :------------------- | :--------------------------------------------------------------------- |
-| **React**            | A JavaScript library for building user interfaces                      |
-| **TypeScript**       | A typed superset of JavaScript that compiles to plain JavaScript       |
-| **Vite**             | A fast build tool for modern web projects                              |
-| **Tailwind CSS**     | A utility-first CSS framework for rapid UI development                 |
-| **Supabase**         | Open-source Firebase alternative for backend services (Auth, Database) |
-| **React Query**      | Powerful asynchronous state management for React                       |
-| **React Router DOM** | Declarative routing for React applications                             |
-| **React Hook Form**  | Performant and flexible forms with easy validation                     |
-| **Swiper**           | Modern touch slider for carousels and galleries                        |
-| **ESLint**           | Pluggable JavaScript linter for code quality                           |
-| **Prettier**         | Opinionated code formatter                                             |
+| Technology          | Purpose             | Link                                                  |
+| :------------------ | :------------------ | :---------------------------------------------------- |
+| **React 19**        | UI Library          | [react.dev](https://react.dev/)                       |
+| **TypeScript**      | Type Safety         | [typescriptlang.org](https://www.typescriptlang.org/) |
+| **Supabase**        | Backend & Auth      | [supabase.com](https://supabase.com/)                 |
+| **TanStack Query**  | State Management    | [tanstack.com](https://tanstack.com/query)            |
+| **Tailwind CSS**    | Styling             | [tailwindcss.com](https://tailwindcss.com/)           |
+| **Vite**            | Build Tool          | [vitejs.dev](https://vitejs.dev/)                     |
+| **Swiper**          | Carousel Components | [swiperjs.com](https://swiperjs.com/)                 |
+| **React Hook Form** | Form Handling       | [react-hook-form.com](https://react-hook-form.com/)   |
 
 ## Author Info
 
