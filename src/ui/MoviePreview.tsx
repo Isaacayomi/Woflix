@@ -41,7 +41,7 @@ function MoviePreview({ movie, onClose }: MoviePreviewProps) {
               >
                 ▶
                 <span className="text-sm font-medium text-white">
-                  Play demo
+                  Play Trailer
                 </span>
               </button>
             </div>
