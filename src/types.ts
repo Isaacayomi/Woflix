@@ -11,13 +11,14 @@ export type Thumbnail = {
 };
 
 export type Movie = {
-  id: string;
+  id: number;
   title: string;
   year: string;
   category: string;
   rating: string;
   thumbnail: Thumbnail;
   videoUrl?: string;
+  isBookmarked: boolean;
 };
 
 export type MoviesProps = {
