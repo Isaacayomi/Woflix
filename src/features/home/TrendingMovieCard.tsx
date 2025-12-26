@@ -2,6 +2,7 @@ import { Movie } from "types";
 import { useBookmark } from "../../hooks/useBookmark";
 import SpinnerMini from "../../ui/SpinnerMini";
 import Playicon from "../../ui/Playicon";
+import { useMoviesContext } from "../../context/useMoviesContext";
 
 type TrendingMovieCardProps = {
   movie: Movie;
@@ -9,6 +10,7 @@ type TrendingMovieCardProps = {
 
 function TrendingMovieCard({ movie }: TrendingMovieCardProps) {
   const { bookmarked, handleClick, isPending } = useBookmark(movie);
+  const { openPreview } = useMoviesContext();
 
   return (
     <div
@@ -24,7 +26,14 @@ function TrendingMovieCard({ movie }: TrendingMovieCardProps) {
 
       {/* Play Icon */}
       <div className="z-20">
-        <Playicon className="transition duration-300 group-hover:flex" />
+        <Playicon
+          onClick={(e) => {
+            e.stopPropagation();
+            openPreview(movie);
+            console.log("working");
+          }}
+          className="transition duration-300 group-hover:flex"
+        />
       </div>
 
       {/* Bookmark icon */}

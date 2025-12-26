@@ -1,9 +1,10 @@
 import { PlayIconProps } from "types";
 
-function Playicon({ className }: PlayIconProps) {
+function Playicon({ className, onClick }: PlayIconProps) {
   return (
     <button
-      className={`absolute left-1/2 top-1/2 z-20 flex -translate-x-1/2 -translate-y-1/2 items-center gap-[1.19rem] rounded-full bg-[#ffffff6e] px-4 py-2 opacity-0 transition duration-300 group-hover:opacity-100 ${className}`}
+      onClick={onClick}
+      className={`absolute left-1/2 top-1/2 z-20 flex -translate-x-1/2 -translate-y-1/2 items-center gap-[1.19rem] rounded-full bg-[#ffffff6e] px-4 py-2 opacity-0 transition duration-300 group-hover:opacity-100 ${className} `}
     >
       <span>
         <svg

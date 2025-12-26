@@ -4,18 +4,7 @@ import { useLocation } from "react-router-dom";
 import { getMovies } from "../services/apiMovies";
 import { getSeries } from "../services/apiSeries";
 import { getBookmark } from "../services/apiBookmark";
-import { Movie } from "types";
-
-type MovieContextType = {
-  baseMovies: Movie[];
-  allMovies: Movie[];
-  movies: Movie[];
-  series: Movie[];
-  bookmarked: Movie[];
-  searchQuery: string;
-  setSearchQuery: (query: string) => void;
-  setBaseMovies: (movies: Movie[]) => void;
-};
+import { Movie, MovieContextType } from "types";
 
 type ProviderProps = {
   children: React.ReactNode;
@@ -34,6 +23,8 @@ function MovieProvider({ children }: ProviderProps) {
   const [series, setSeries] = useState<Movie[]>([]);
   const [bookmarked, setBookmarked] = useState<Movie[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [showPreview, setShowPreview] = useState<boolean>(false);
+  const [previewMovie, setPreviewMovie] = useState<Movie | null>(null);
 
   useEffect(() => {
     async function fetchMovies() {
@@ -55,6 +46,16 @@ function MovieProvider({ children }: ProviderProps) {
     fetchMovies();
   }, [navigation]);
 
+  const openPreview = (movie: Movie) => {
+    setPreviewMovie(movie);
+    setShowPreview(true);
+  };
+
+  const closePreview = () => {
+    setPreviewMovie(null);
+    setShowPreview(false);
+  };
+
   return (
     <MovieContext.Provider
       value={{
@@ -66,6 +67,12 @@ function MovieProvider({ children }: ProviderProps) {
         setSearchQuery,
         baseMovies,
         setBaseMovies,
+        showPreview,
+        setShowPreview,
+        previewMovie,
+        setPreviewMovie,
+        openPreview,
+        closePreview,
       }}
     >
       {children}

@@ -34,6 +34,7 @@ export type ButtonProp = {
 
 export type PlayIconProps = {
   className: string;
+  onClick?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 };
 
 export type AuthProps = {
@@ -41,4 +42,24 @@ export type AuthProps = {
   password: string;
   confirmPassword?: string;
   message?: string;
+};
+
+export type MovieContextType = {
+  baseMovies: Movie[];
+  allMovies: Movie[];
+  movies: Movie[];
+  series: Movie[];
+  bookmarked: Movie[];
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+  setBaseMovies: (movies: Movie[]) => void;
+
+  showPreview: boolean;
+  setShowPreview: (show: boolean) => void;
+
+  previewMovie: Movie | null;
+  setPreviewMovie: (movie: Movie | null) => void;
+
+  openPreview: (movie: Movie) => void;
+  closePreview: () => void;
 };
