@@ -11,13 +11,13 @@ export type Thumbnail = {
 };
 
 export type Movie = {
-  id: number;
+  id: string;
   title: string;
-  year: number;
-  rating: string;
+  year: string;
   category: string;
+  rating: string;
   thumbnail: Thumbnail;
-  isBookmarked: boolean;
+  videoUrl?: string;
 };
 
 export type MoviesProps = {
@@ -62,4 +62,9 @@ export type MovieContextType = {
 
   openPreview: (movie: Movie) => void;
   closePreview: () => void;
+};
+
+export type MoviePreviewProps = {
+  movie: Movie;
+  onClose: () => void;
 };
