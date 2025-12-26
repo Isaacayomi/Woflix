@@ -12,7 +12,7 @@ function TrendingMovieCard({ movie }: TrendingMovieCardProps) {
 
   return (
     <div
-      className="group relative z-10 flex aspect-[16/9] w-full max-w-[29.375rem] flex-col rounded-lg bg-cover bg-no-repeat md:cursor-pointer"
+      className="group relative z-10 flex aspect-[16/9] w-full flex-col rounded-lg bg-cover bg-no-repeat md:cursor-pointer"
       style={{
         backgroundImage: `url(${movie.thumbnail.trending?.large})`,
         backgroundSize: "cover",

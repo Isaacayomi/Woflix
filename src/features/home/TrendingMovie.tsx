@@ -13,7 +13,7 @@ function TrendingMovie() {
   return (
     <Swiper
       modules={[Autoplay, FreeMode]}
-      spaceBetween={16}
+      spaceBetween={32}
       freeMode
       loop
       autoplay={{
