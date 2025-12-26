@@ -12,13 +12,11 @@ function AppLayout() {
         <div className="mx-auto grid max-w-[1500px] gap-9 p-8 sm:grid-cols-[1fr] sm:grid-rows-[1fr] lg:grid-cols-[6rem_1fr] lg:grid-rows-[auto_1fr]">
           <Navbar />
 
-          {/* Everything that needs movie context goes inside the provider */}
           <MovieProvider>
             <Search />
 
             <main className="overflow-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               <Outlet />
-              {/* Render the preview modal inside the provider */}
               <MoviePreviewWrapper />
             </main>
           </MovieProvider>

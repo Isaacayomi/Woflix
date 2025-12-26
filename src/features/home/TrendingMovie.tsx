@@ -22,7 +22,6 @@ function TrendingMovie() {
       }}
       breakpoints={{
         320: { slidesPerView: 1.2, spaceBetween: 6 },
-        // 480: { slidesPerView: 1.6, spaceBetween: 8 },
         640: { slidesPerView: 2.2, spaceBetween: 12 },
       }}
     >

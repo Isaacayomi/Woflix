@@ -1,17 +1,17 @@
 import { useBookmark } from "../hooks/useBookmark";
 import { MoviesProps } from "types";
-
 import Playicon from "./Playicon";
 import SpinnerMini from "./SpinnerMini";
+import { useMoviesContext } from "../context/useMoviesContext";
 
 function MovieCard({ movie }: MoviesProps) {
   const { bookmarked, isPending, handleClick } = useBookmark(movie);
+  const { openPreview } = useMoviesContext(); // <-- get context function
   const { title, year, category, rating, thumbnail } = movie;
   const { regular } = thumbnail;
 
   return (
     <div className="mb-4 flex flex-col">
-      {/* Movie Image */}
       <div
         style={{
           backgroundImage: regular.large && `url(${regular.large})`,
@@ -20,15 +20,19 @@ function MovieCard({ movie }: MoviesProps) {
         }}
         className="group relative z-10 aspect-[16/9] w-full rounded-lg bg-cover bg-no-repeat md:cursor-pointer"
       >
-        {/* Black overlay */}
         <div className="absolute inset-0 z-0 bg-black opacity-0 transition duration-300 group-hover:opacity-50"></div>
 
-        {/* Play Icon */}
         <div className="z-20">
-          <Playicon className="transition duration-300 md:flex md:group-hover:flex" />
+          <Playicon
+            onClick={(e) => {
+              e.stopPropagation();
+              openPreview(movie);
+              // console.log("Preview opened for:", title);
+            }}
+            className="transition duration-300 md:flex md:group-hover:flex"
+          />
         </div>
 
-        {/* Bookmark icon */}
         <div
           onClick={handleClick}
           className="opacity-[0.5006 ] absolute right-0 z-20 mr-[0.5rem] mt-[0.5rem] h-8 w-8 rounded-[2rem] bg-darkBlue md:mr-6"
@@ -39,7 +43,11 @@ function MovieCard({ movie }: MoviesProps) {
             </div>
           ) : (
             <img
-              src={`${bookmarked ? "./assets/icon-bookmark-full.svg" : "./assets/icon-bookmark-empty.svg"} `}
+              src={
+                bookmarked
+                  ? "./assets/icon-bookmark-full.svg"
+                  : "./assets/icon-bookmark-empty.svg"
+              }
               alt="Bookmark icon"
               className="m-auto flex items-center justify-center py-[0.56rem]"
             />
@@ -47,7 +55,6 @@ function MovieCard({ movie }: MoviesProps) {
         </div>
       </div>
 
-      {/* Movie Info */}
       <div className="mt-2 flex flex-col gap-1">
         <div className="flex items-center gap-2 text-xs font-normal text-white opacity-80 lg:text-[0.9375rem]">
           <p>{year}</p>
@@ -65,7 +72,11 @@ function MovieCard({ movie }: MoviesProps) {
           <p className="flex items-center gap-[0.38rem]">
             <span>
               <img
-                src={`${category === "movie" ? "./assets/icon-category-movies.svg" : "./assets/icon-category-tv.svg"}`}
+                src={
+                  category === "movie"
+                    ? "./assets/icon-category-movies.svg"
+                    : "./assets/icon-category-tv.svg"
+                }
                 alt={`${category} movie`}
               />
             </span>
@@ -90,4 +101,5 @@ function MovieCard({ movie }: MoviesProps) {
     </div>
   );
 }
+
 export default MovieCard;

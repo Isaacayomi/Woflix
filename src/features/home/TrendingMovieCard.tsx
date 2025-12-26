@@ -21,22 +21,19 @@ function TrendingMovieCard({ movie }: TrendingMovieCardProps) {
         backgroundRepeat: "no-repeat",
       }}
     >
-      {/* Black overlay */}
       <div className="absolute inset-0 z-0 bg-black opacity-0 transition duration-300 group-hover:opacity-50"></div>
 
-      {/* Play Icon */}
       <div className="z-20">
         <Playicon
           onClick={(e) => {
             e.stopPropagation();
             openPreview(movie);
-            console.log("working");
+            // console.log("working");
           }}
           className="transition duration-300 group-hover:flex"
         />
       </div>
 
-      {/* Bookmark icon */}
       <div
         onClick={handleClick}
         className="absolute right-0 z-20 mr-[0.56rem] mt-[0.5rem] h-8 w-8 rounded-[2rem] bg-darkBlue md:mr-6"
@@ -58,9 +55,7 @@ function TrendingMovieCard({ movie }: TrendingMovieCardProps) {
         )}
       </div>
 
-      {/* Text wrapper at the bottom */}
       <div className="relative z-20 mt-auto p-4">
-        {/* Meta info */}
         <div className="flex items-center gap-2 text-xs font-normal text-white opacity-80 lg:text-[0.9375rem]">
           <p>{movie.year}</p>
           <span>
@@ -102,7 +97,6 @@ function TrendingMovieCard({ movie }: TrendingMovieCardProps) {
           <p>{movie.rating}</p>
         </div>
 
-        {/* Title */}
         <p className="font-outfit text-[0.9375rem] font-normal text-white lg:text-2xl">
           {movie.title}
         </p>
