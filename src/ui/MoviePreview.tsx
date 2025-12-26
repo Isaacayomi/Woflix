@@ -6,22 +6,21 @@ type MoviePreviewProps = {
 };
 
 function MoviePreview({ movie, onClose }: MoviePreviewProps) {
+  const imageUrl =
+    movie.thumbnail.trending?.large || movie.thumbnail.regular.large;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-      {/* Backdrop */}
       <div className="absolute inset-0" onClick={onClose} />
 
-      {/* Card */}
       <div className="relative z-10 w-[92%] max-w-4xl overflow-hidden rounded-xl bg-darkBlue shadow-xl">
-        {/* Video / Thumbnail */}
         <div className="relative aspect-video bg-black">
           <img
-            src={movie.thumbnail.trending?.large}
+            src={imageUrl}
             alt={movie.title}
             className="h-full w-full object-cover opacity-80"
           />
 
-          {/* Play overlay */}
           <div className="absolute inset-0 flex items-center justify-center">
             <button className="flex items-center gap-3 rounded-full bg-white/10 px-6 py-3 backdrop-blur-md hover:bg-white/20">
               ▶
@@ -29,7 +28,6 @@ function MoviePreview({ movie, onClose }: MoviePreviewProps) {
             </button>
           </div>
 
-          {/* Close */}
           <button
             onClick={onClose}
             className="absolute right-4 top-4 rounded-full bg-black/60 px-3 py-1 text-sm text-white hover:bg-black/80"
@@ -38,7 +36,6 @@ function MoviePreview({ movie, onClose }: MoviePreviewProps) {
           </button>
         </div>
 
-        {/* Info */}
         <div className="space-y-2 p-6">
           <h2 className="text-xl font-semibold">{movie.title}</h2>
 
