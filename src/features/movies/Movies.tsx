@@ -1,37 +1,107 @@
+import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useMovies } from "../../hooks/useMovies";
-import { useMoviesContext } from "../../context/useMoviesContext";
+import { useGenres } from "../../hooks/useGenres";
 import Heading from "../../ui/Heading";
 import MovieCard from "../../ui/MovieCard";
 import Spinner from "../../ui/Spinner";
+import MovieCardSkeleton from "../../ui/skeletons/MovieCardSkeleton";
 
 function Movies() {
-  const { movies, isPending } = useMovies();
-  const { movies: contextMovies, searchQuery } = useMoviesContext();
+  const [searchParams] = useSearchParams();
+  const query = searchParams.get("q") || "";
+  const [genreFilter, setGenreFilter] = useState<number | null>(null);
+  const { movieGenres } = useGenres();
 
-  const normalizedQuery = searchQuery?.trim().toLowerCase() || "";
+  const {
+    movies,
+    isPending,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useMovies(query, genreFilter ?? undefined);
 
-  const displayedMovies = normalizedQuery
-    ? contextMovies.filter((movie) =>
-        movie.title.toLowerCase().includes(normalizedQuery),
-      )
-    : movies;
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!hasNextPage || isFetchingNextPage) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.5 },
+    );
+
+    const el = sentinelRef.current;
+    if (el) observer.observe(el);
+
+    return () => {
+      if (el) observer.unobserve(el);
+    };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   return (
     <div className="h-screen">
-      {isPending && <Spinner />}
-
-      {!searchQuery ? (
-        <Heading>Movies</Heading>
-      ) : (
-        <Heading>{`${normalizedQuery ? `Found ${displayedMovies?.length} results for "${searchQuery}"` : "Movies"}`}</Heading>
+      {isPending && !movies.length && (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <MovieCardSkeleton key={i} />
+          ))}
+        </div>
       )}
 
+      {!query && (
+        <Heading>Movies</Heading>
+      )}
+
+      <Heading>
+        {query ? `Found ${movies.length} results for "${query}"` : ""}
+      </Heading>
+
+      {!query && movieGenres.length > 0 && (
+        <div className="mb-6 flex flex-wrap gap-2">
+          <button
+            onClick={() => setGenreFilter(null)}
+            className={`rounded-full px-3 py-1 text-sm transition-colors ${
+              genreFilter === null
+                ? "bg-red text-white"
+                : "bg-semiDarkBlue text-white hover:bg-white/20"
+            }`}
+          >
+            All
+          </button>
+          {movieGenres.map((g) => (
+            <button
+              key={g.id}
+              onClick={() => setGenreFilter(g.id)}
+              className={`rounded-full px-3 py-1 text-sm transition-colors ${
+                genreFilter === g.id
+                  ? "bg-red text-white"
+                  : "bg-semiDarkBlue text-white hover:bg-white/20"
+              }`}
+            >
+              {g.name}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {!isPending && movies.length === 0 && <p>No results found</p>}
+
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {displayedMovies?.length === 0 && <p>No results found</p>}
-        {displayedMovies?.map((movie) => (
+        {movies.map((movie) => (
           <MovieCard movie={movie} key={movie.id} />
         ))}
       </div>
+
+      {hasNextPage && (
+        <div ref={sentinelRef} className="flex justify-center py-8">
+          {isFetchingNextPage && <Spinner />}
+        </div>
+      )}
     </div>
   );
 }

@@ -8,10 +8,6 @@ function ProtectedRoute({ children }: ButtonProp) {
   const navigate = useNavigate();
   const { isPending, isAuthenticated } = useUser();
 
-  if (isPending) <Spinner />;
-
-  // if there's no auth user, redirect to login page
-
   useEffect(
     function () {
       if (!isAuthenticated && !isPending) {
@@ -21,6 +17,10 @@ function ProtectedRoute({ children }: ButtonProp) {
     [isAuthenticated, isPending, navigate],
   );
 
-  if (isAuthenticated) return children;
+  if (isPending) return <Spinner />;
+
+  if (!isAuthenticated) return null;
+
+  return children;
 }
 export default ProtectedRoute;

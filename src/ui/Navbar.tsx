@@ -1,15 +1,20 @@
 import { NavLink } from "react-router-dom";
+import { useLogout } from "../hooks/useLogout";
+// import { useDarkMode } from "../hooks/useDarkMode";
 
 function Navbar() {
+  const { logout, isPending } = useLogout();
+  // const [dark, toggleDark] = useDarkMode();
+
   return (
-    <nav className="flex items-center justify-between rounded-[1.25rem] bg-semiDarkBlue p-4 lg:row-span-2 lg:flex-col lg:justify-between lg:py-8">
+    <nav className="flex items-center justify-between rounded-[1.25rem] bg-semiDarkBlue p-4 lg:sticky lg:top-0 lg:h-screen lg:w-[6rem] lg:flex-shrink-0 lg:flex-col lg:py-8">
       <img
-        src="./assets/icon-nav-movies.svg"
+        src="/assets/icon-nav-movies.svg"
         alt="movies nav icon"
-        className="lg:pb-[4.69rem]"
+        className="lg:pb-12"
       />
 
-      <div className="flex gap-6 lg:flex-col lg:gap-[3.75rem] lg:pb-[34.5rem]">
+      <div className="flex gap-6 lg:flex-col lg:items-center lg:gap-[3.75rem]">
         <NavLink
           to="/"
           className={({ isActive }) =>
@@ -17,6 +22,7 @@ function Navbar() {
               isActive ? "text-white" : "text-grayishBlue"
             } transition-colors duration-200 hover:text-red focus:border-none focus:text-white focus:outline-none`
           }
+          title="Home"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -39,6 +45,7 @@ function Navbar() {
               isActive ? "text-white" : "text-grayishBlue"
             } transition-colors duration-200 hover:text-red focus:border-none focus:text-white focus:outline-none`
           }
+          title="Movies"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -61,6 +68,7 @@ function Navbar() {
               isActive ? "text-white" : "text-grayishBlue"
             } transition-colors duration-200 hover:text-red focus:border-none focus:text-white focus:outline-none`
           }
+          title="TV Series"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -83,6 +91,7 @@ function Navbar() {
               isActive ? "text-white" : "text-grayishBlue"
             } transition-colors duration-200 hover:text-red focus:border-none focus:text-white focus:outline-none`
           }
+          title="Bookmarks"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -94,16 +103,72 @@ function Navbar() {
             <path d="M15.3866 0C15.5893 0 15.7832 0.0396563 15.9683 0.118969C16.2591 0.233532 16.4904 0.414188 16.6623 0.660939C16.8341 0.907689 16.92 1.18088 16.92 1.4805V18.5195C16.92 18.8191 16.8341 19.0923 16.6623 19.3391C16.4904 19.5858 16.2591 19.7665 15.9683 19.881C15.8008 19.9515 15.607 19.9868 15.3866 19.9868C14.9636 19.9868 14.5979 19.8458 14.2895 19.5638L8.46001 13.959L2.63054 19.5638C2.31328 19.8546 1.94757 20 1.53338 20C1.33069 20 1.13681 19.9603 0.951751 19.881C0.660939 19.7665 0.42961 19.5858 0.257766 19.3391C0.085922 19.0923 0 18.8191 0 18.5195V1.4805C0 1.18088 0.085922 0.907689 0.257766 0.660939C0.42961 0.414188 0.660939 0.233532 0.951751 0.118969C1.13681 0.0396563 1.33069 0 1.53338 0H15.3866Z" />
           </svg>
         </NavLink>
+        <NavLink
+          to="/history"
+          className={({ isActive }) =>
+            `${
+              isActive ? "text-white" : "text-grayishBlue"
+            } transition-colors duration-200 hover:text-red focus:border-none focus:text-white focus:outline-none`
+          }
+          title="History"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg>
+        </NavLink>
       </div>
 
-      <div className="h-[2.5rem] w-[2.5rem] overflow-hidden rounded-full border border-white">
-        <img
-          src="./assets/image-avatar.png"
-          alt="Avatar icon"
-          className="h-full w-full object-cover"
-        />
+      <div className="flex items-center gap-3 lg:mt-auto lg:flex-col lg:pb-12">
+        <NavLink
+          to="/profile"
+          className="text-grayishBlue transition-colors duration-200 hover:text-white focus:outline-none"
+          title="Profile"
+        >
+          <div className="h-[2.5rem] w-[2.5rem] overflow-hidden rounded-full border border-white">
+            <img
+              src="/assets/image-avatar.png"
+              alt="Avatar icon"
+              className="h-full w-full object-cover"
+            />
+          </div>
+        </NavLink>
+
+        <button
+          onClick={() => logout()}
+          disabled={isPending}
+          className="text-grayishBlue transition-colors duration-200 hover:text-red focus:outline-none"
+          title="Logout"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+        </button>
       </div>
     </nav>
   );
 }
 export default Navbar;
+

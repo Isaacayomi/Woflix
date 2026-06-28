@@ -1,17 +1,18 @@
-import { useQuery } from "@tanstack/react-query";
-import { getCurrentUser } from "../services/apiAuth";
+import { useState, useEffect } from "react";
+import { auth } from "../lib/firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 export function useUser() {
-  const {
-    data: user,
-    error,
-    isPending,
-  } = useQuery({
-    queryFn: getCurrentUser,
-    queryKey: ["user"],
-  });
+  const [user, setUser] = useState<object | null>(null);
+  const [isPending, setIsPending] = useState(true);
 
-  if (error) throw new Error(error.message);
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+      setIsPending(false);
+    });
+    return unsubscribe;
+  }, []);
 
-  return { isPending, error, isAuthenticated: user?.role === "authenticated" };
+  return { isPending, isAuthenticated: !!user };
 }

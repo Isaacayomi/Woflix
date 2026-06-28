@@ -44,7 +44,6 @@ function Login() {
             placeholder="Email address"
             className="w-full bg-transparent pb-[1.13rem] text-white focus:outline-none"
             aria-invalid={errors.email ? "true" : "false"}
-            defaultValue="test@example.com"
             {...register("email", {
               required: "This field cannot be empty",
               setValueAs: (value) => value.trim(), // to trim spaces
@@ -67,7 +66,6 @@ function Login() {
             placeholder="Password"
             className="w-full bg-transparent pb-[1.13rem] text-white focus:outline-none"
             aria-invalid={errors.password ? "true" : "false"}
-            defaultValue="test@123"
             {...register("password", {
               required: "This field cannot be empty",
               setValueAs: (value) => value.trim(),

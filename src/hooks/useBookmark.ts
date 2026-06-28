@@ -2,7 +2,7 @@ import toast from "react-hot-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { updateBookmark } from "../services/apiUpdateBookmark";
-import { Movie } from "types";
+import type { Movie } from "types";
 
 export function useBookmark(movie: Movie) {
   const { title, isBookmarked, id } = movie;
@@ -14,21 +14,23 @@ export function useBookmark(movie: Movie) {
   }, [isBookmarked]);
 
   const queryClient = useQueryClient();
+
   const { isPending, mutate } = useMutation({
     mutationFn: updateBookmark,
-    onSuccess: (updatedMovie) => {
-      // invalidate queries basically lets the entire cache be refetched after a mutation has been made so that the UI is always in sync with the server
+
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["trendingMovies"] });
       queryClient.invalidateQueries({ queryKey: ["allMovies"] });
       queryClient.invalidateQueries({ queryKey: ["bookmarkedMovies"] });
 
       toast.success(
-        updatedMovie.isBookmarked
+        variables.newValue
           ? `${title} has been added to bookmarks`
           : `${title} has been removed from bookmarks`,
         { style: { fontSize: "0.875rem", textAlign: "center" } },
       );
     },
+
     onError: (err: Error) => {
       toast.error(`Something went wrong: ${err.message}`);
       setBookmarked(isBookmarked);

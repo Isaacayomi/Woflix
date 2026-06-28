@@ -1,25 +1,33 @@
-import { Outlet } from "react-router-dom";
-import { MovieProvider } from "../context/MovieContext";
+import { Outlet, Link } from "react-router-dom";
 import Search from "../features/search/Search";
 import Navbar from "./Navbar";
 import ProtectedRoute from "./ProtectedRoute";
-import MoviePreviewWrapper from "./MoviePreviewWrapper";
 
 function AppLayout() {
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-darkBlue font-outfit text-white">
-        <div className="mx-auto grid max-w-[1500px] gap-9 p-8 sm:grid-cols-[1fr] sm:grid-rows-[1fr] lg:grid-cols-[6rem_1fr] lg:grid-rows-[auto_1fr]">
+        <div className="mx-auto flex max-w-[1500px] gap-9 p-8">
           <Navbar />
 
-          <MovieProvider>
-            <Search />
+          <div className="flex min-w-0 flex-1 flex-col gap-9">
+            <header className="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-8">
+              <Link
+                to="/"
+                className="shrink-0 text-3xl font-black tracking-[0.08em] text-red transition-colors duration-200 hover:text-red/80 sm:text-4xl"
+                aria-label="WòFlix home"
+              >
+                WòFlix
+              </Link>
+              <div className="min-w-0 flex-1">
+                <Search />
+              </div>
+            </header>
 
             <main className="overflow-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               <Outlet />
-              <MoviePreviewWrapper />
             </main>
-          </MovieProvider>
+          </div>
         </div>
       </div>
     </ProtectedRoute>

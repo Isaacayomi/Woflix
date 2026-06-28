@@ -1,22 +1,65 @@
-import supabase from "./supabase";
+import { auth, db } from "../lib/firebase";
+import {
+  doc,
+  setDoc,
+  deleteDoc,
+  collection,
+} from "firebase/firestore";
+import { tmdbFetch, imageUrl } from "../lib/tmdb";
 
 export async function updateBookmark({
   newValue,
-  id,
+  id: tmdbId,
 }: {
   newValue: boolean;
   id: number;
 }) {
-  const { data, error } = await supabase
-    .from("catalog")
-    .update({ isBookmarked: newValue })
-    .eq("id", id)
-    .select("id, isBookmarked");
-  if (error) throw new Error(error.message);
+  const user = auth.currentUser;
+  if (!user) throw new Error("User not authenticated");
 
-  if (!data || data.length === 0) {
-    throw new Error("No row updated (check id / RLS / permissions)");
+  const ref = doc(collection(db, "users", user.uid, "bookmarks"), String(tmdbId));
+
+  if (newValue) {
+    const details = await tmdbFetch<{
+      title?: string;
+      name?: string;
+      release_date?: string;
+      first_air_date?: string;
+      poster_path: string | null;
+      backdrop_path: string | null;
+      vote_average: number;
+    }>(`/movie/${tmdbId}`).catch(async () => {
+      return tmdbFetch<{
+        title?: string;
+        name?: string;
+        release_date?: string;
+        first_air_date?: string;
+        poster_path: string | null;
+        backdrop_path: string | null;
+        vote_average: number;
+      }>(`/tv/${tmdbId}`);
+    });
+
+    const title = details.title || details.name || "Unknown";
+    const year = (details.release_date || details.first_air_date || "").slice(
+      0,
+      4,
+    );
+    const mediaType = details.title ? "movie" : "tv";
+
+    await setDoc(ref, {
+      tmdbId,
+      title,
+      year,
+      mediaType,
+      rating: details.vote_average ? details.vote_average.toFixed(1) : "N/A",
+      posterSmall: imageUrl(details.poster_path, "w185"),
+      posterMedium: imageUrl(details.poster_path, "w342"),
+      posterLarge: imageUrl(details.poster_path, "w500"),
+      backdropLarge: imageUrl(details.backdrop_path, "w1280"),
+      addedAt: Date.now(),
+    });
+  } else {
+    await deleteDoc(ref);
   }
-
-  return data[0];
 }

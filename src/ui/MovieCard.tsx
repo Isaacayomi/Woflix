@@ -1,18 +1,21 @@
+import { useNavigate } from "react-router-dom";
 import { useBookmark } from "../hooks/useBookmark";
-import { MoviesProps } from "types";
+import type { MoviesProps } from "types";
 import Playicon from "./Playicon";
 import SpinnerMini from "./SpinnerMini";
-import { useMoviesContext } from "../context/useMoviesContext";
 
 function MovieCard({ movie }: MoviesProps) {
+  const navigate = useNavigate();
   const { bookmarked, isPending, handleClick } = useBookmark(movie);
-  const { openPreview } = useMoviesContext(); // <-- get context function
   const { title, year, category, rating, thumbnail } = movie;
   const { regular } = thumbnail;
+
+  const route = category === "tv series" ? `/tv/${movie.id}` : `/movie/${movie.id}`;
 
   return (
     <div className="mb-4 flex flex-col">
       <div
+        onClick={() => navigate(route)}
         style={{
           backgroundImage: regular.large && `url(${regular.large})`,
           backgroundSize: "cover",
@@ -26,15 +29,17 @@ function MovieCard({ movie }: MoviesProps) {
           <Playicon
             onClick={(e) => {
               e.stopPropagation();
-              openPreview(movie);
-              // console.log("Preview opened for:", title);
+              navigate(route);
             }}
             className="transition duration-300 md:flex md:group-hover:flex"
           />
         </div>
 
         <div
-          onClick={handleClick}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleClick();
+          }}
           className="opacity-[0.5006 ] absolute right-0 z-20 mr-[0.5rem] mt-[0.5rem] h-8 w-8 rounded-[2rem] bg-darkBlue md:mr-6"
         >
           {isPending ? (
@@ -45,8 +50,8 @@ function MovieCard({ movie }: MoviesProps) {
             <img
               src={
                 bookmarked
-                  ? "./assets/icon-bookmark-full.svg"
-                  : "./assets/icon-bookmark-empty.svg"
+                  ? "/assets/icon-bookmark-full.svg"
+                  : "/assets/icon-bookmark-empty.svg"
               }
               alt="Bookmark icon"
               className="m-auto flex items-center justify-center py-[0.56rem]"
@@ -74,8 +79,8 @@ function MovieCard({ movie }: MoviesProps) {
               <img
                 src={
                   category === "movie"
-                    ? "./assets/icon-category-movies.svg"
-                    : "./assets/icon-category-tv.svg"
+                    ? "/assets/icon-category-movies.svg"
+                    : "/assets/icon-category-tv.svg"
                 }
                 alt={`${category} movie`}
               />

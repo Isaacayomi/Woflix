@@ -1,19 +1,22 @@
-import { Movie } from "types";
+import { useNavigate } from "react-router-dom";
+import type { Movie } from "types";
 import { useBookmark } from "../../hooks/useBookmark";
 import SpinnerMini from "../../ui/SpinnerMini";
 import Playicon from "../../ui/Playicon";
-import { useMoviesContext } from "../../context/useMoviesContext";
 
 type TrendingMovieCardProps = {
   movie: Movie;
 };
 
 function TrendingMovieCard({ movie }: TrendingMovieCardProps) {
+  const navigate = useNavigate();
   const { bookmarked, handleClick, isPending } = useBookmark(movie);
-  const { openPreview } = useMoviesContext();
+
+  const route = movie.category === "tv series" ? `/tv/${movie.id}` : `/movie/${movie.id}`;
 
   return (
     <div
+      onClick={() => navigate(route)}
       className="group relative z-10 flex aspect-[16/9] w-full flex-col rounded-lg bg-cover bg-no-repeat md:cursor-pointer"
       style={{
         backgroundImage: `url(${movie.thumbnail.trending?.large})`,
@@ -27,15 +30,17 @@ function TrendingMovieCard({ movie }: TrendingMovieCardProps) {
         <Playicon
           onClick={(e) => {
             e.stopPropagation();
-            openPreview(movie);
-            // console.log("working");
+            navigate(route);
           }}
           className="transition duration-300 group-hover:flex"
         />
       </div>
 
       <div
-        onClick={handleClick}
+        onClick={(e) => {
+          e.stopPropagation();
+          handleClick();
+        }}
         className="absolute right-0 z-20 mr-[0.56rem] mt-[0.5rem] h-8 w-8 rounded-[2rem] bg-darkBlue md:mr-6"
       >
         {isPending ? (
@@ -44,11 +49,11 @@ function TrendingMovieCard({ movie }: TrendingMovieCardProps) {
           </div>
         ) : (
           <img
-            src={
-              bookmarked
-                ? "./assets/icon-bookmark-full.svg"
-                : "./assets/icon-bookmark-empty.svg"
-            }
+              src={
+                bookmarked
+                  ? "/assets/icon-bookmark-full.svg"
+                  : "/assets/icon-bookmark-empty.svg"
+              }
             alt="Bookmark icon"
             className="m-auto flex items-center justify-center py-[0.56rem]"
           />

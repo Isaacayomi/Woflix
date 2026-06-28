@@ -45,27 +45,115 @@ export type AuthProps = {
   message?: string;
 };
 
-export type MovieContextType = {
-  baseMovies: Movie[];
-  allMovies: Movie[];
-  movies: Movie[];
-  series: Movie[];
-  bookmarked: Movie[];
-  searchQuery: string;
-  setSearchQuery: (query: string) => void;
-  setBaseMovies: (movies: Movie[]) => void;
+/* ─────────── TMDB API types ─────────── */
 
-  showPreview: boolean;
-  setShowPreview: (show: boolean) => void;
-
-  previewMovie: Movie | null;
-  setPreviewMovie: (movie: Movie | null) => void;
-
-  openPreview: (movie: Movie) => void;
-  closePreview: () => void;
+export type TMDBMovieResult = {
+  id: number;
+  title?: string;
+  name?: string;
+  overview: string;
+  poster_path: string | null;
+  backdrop_path: string | null;
+  media_type: string;
+  release_date?: string;
+  first_air_date?: string;
+  vote_average: number;
+  vote_count: number;
+  genre_ids: number[];
+  original_language: string;
+  popularity: number;
 };
 
-export type MoviePreviewProps = {
-  movie: Movie;
-  onClose: () => void;
+export type TMDBPage<T> = {
+  page: number;
+  results: T[];
+  total_pages: number;
+  total_results: number;
+};
+
+export type TMDBDetail = {
+  id: number;
+  title?: string;
+  name?: string;
+  overview: string;
+  poster_path: string | null;
+  backdrop_path: string | null;
+  release_date?: string;
+  first_air_date?: string;
+  vote_average: number;
+  vote_count: number;
+  genres: { id: number; name: string }[];
+  runtime: number | null;
+  tagline: string;
+  status: string;
+  number_of_seasons?: number;
+  number_of_episodes?: number;
+  spoken_languages: { english_name: string; iso_639_1: string }[];
+};
+
+export type TMDBVideo = {
+  id: string;
+  key: string;
+  name: string;
+  site: string;
+  type: string;
+  official: boolean;
+};
+
+export type TMDBVideosResponse = {
+  id: number;
+  results: TMDBVideo[];
+};
+
+export type TMDBCastMember = {
+  id: number;
+  name: string;
+  character: string;
+  profile_path: string | null;
+  known_for_department: string;
+  order: number;
+};
+
+export type TMDBCreditsResponse = {
+  id: number;
+  cast: TMDBCastMember[];
+  crew: { id: number; name: string; job: string; department: string }[];
+};
+
+export type TMDBGenre = {
+  id: number;
+  name: string;
+};
+
+export type TMDBGenreListResponse = {
+  genres: TMDBGenre[];
+};
+
+export type TMDBWatchProvider = {
+  provider_id: number;
+  provider_name: string;
+  logo_path: string;
+  display_priority: number;
+};
+
+export type TMDBWatchProvidersResponse = {
+  id: number;
+  results: {
+    US?: {
+      flatrate?: TMDBWatchProvider[];
+      rent?: TMDBWatchProvider[];
+      buy?: TMDBWatchProvider[];
+      link: string;
+    };
+    [country: string]: unknown;
+  };
+};
+
+export type TMDBCollection = {
+  id: number;
+  name: string;
+  overview: string;
+  poster_path: string | null;
+  backdrop_path: string | null;
+  parts: TMDBMovieResult[];
 };
