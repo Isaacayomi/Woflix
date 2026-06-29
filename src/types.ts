@@ -88,6 +88,16 @@ export type TMDBDetail = {
   status: string;
   number_of_seasons?: number;
   number_of_episodes?: number;
+  seasons?: {
+    air_date: string | null;
+    episode_count: number;
+    id: number;
+    name: string;
+    overview: string;
+    poster_path: string | null;
+    season_number: number;
+    vote_average: number;
+  }[];
   spoken_languages: { english_name: string; iso_639_1: string }[];
 };
 
