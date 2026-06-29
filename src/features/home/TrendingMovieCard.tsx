@@ -61,19 +61,16 @@ function TrendingMovieCard({ movie }: TrendingMovieCardProps) {
       </div>
 
       <div className="relative z-20 mt-auto p-4">
-        <div className="flex items-center gap-2 text-xs font-normal text-white opacity-80 lg:text-[0.9375rem]">
-          <p>{movie.year}</p>
-          <span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="3"
-              height="3"
-              fill="none"
-              viewBox="0 0 3 3"
-            >
-              <circle opacity="0.5" cx="1.5" cy="1.5" r="1.5" fill="white" />
-            </svg>
+        <div className="flex items-center gap-2">
+          <p className="font-outfit text-[0.9375rem] font-normal text-white lg:text-2xl">
+            {movie.title}
+          </p>
+          <span className="rounded bg-white/20 px-2 py-0.5 text-xs font-semibold text-white/90">
+            {movie.year}
           </span>
+        </div>
+
+        <div className="mt-1 flex items-center gap-2 text-xs font-normal text-white opacity-80 lg:text-[0.9375rem]">
           <p className="flex items-center gap-[0.38rem]">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -101,10 +98,6 @@ function TrendingMovieCard({ movie }: TrendingMovieCardProps) {
           </svg>
           <p>{movie.rating}</p>
         </div>
-
-        <p className="font-outfit text-[0.9375rem] font-normal text-white lg:text-2xl">
-          {movie.title}
-        </p>
       </div>
     </div>
   );
