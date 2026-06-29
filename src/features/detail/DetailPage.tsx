@@ -42,7 +42,9 @@ function DetailPage() {
 
   const streamUrl = getStreamUrl(mediaType, tmdbId, season, episode);
 
-  const maxSeasons = detail?.number_of_seasons ?? 1;
+  const airedSeasons = detail?.seasons?.filter(
+    (s) => s.air_date && s.episode_count > 0,
+  ) ?? [];
   const maxEpisodes = 24;
 
   if (isPending) return <Spinner />;
@@ -150,13 +152,13 @@ function DetailPage() {
                     }}
                     className="appearance-none rounded-full bg-white/10 py-2 pl-4 pr-10 text-sm hover:bg-white/20 focus:outline-none"
                   >
-                    {Array.from({ length: maxSeasons }, (_, i) => i + 1).map((s) => (
+                    {airedSeasons.map((s) => (
                       <option
-                        key={s}
-                        value={s}
+                        key={s.season_number}
+                        value={s.season_number}
                         className="bg-darkBlue text-white"
                       >
-                        Season {s}
+                        Season {s.season_number}
                       </option>
                     ))}
                   </select>
