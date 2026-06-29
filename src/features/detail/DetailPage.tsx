@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
-import { useMovieDetail } from "../../hooks/useMovieDetail";
-import { useTVDetail } from "../../hooks/useTVDetail";
+import { useDetail } from "../../hooks/useDetail";
 import { useVideos } from "../../hooks/useVideos";
 import { useCredits } from "../../hooks/useCredits";
 import { useSimilar } from "../../hooks/useSimilar";
@@ -19,10 +18,7 @@ function DetailPage() {
   const mediaType = location.pathname.startsWith("/movie") ? "movie" : "tv";
   const tmdbId = Number(id);
 
-  const movieDetail = useMovieDetail(tmdbId);
-  const tvDetail = useTVDetail(tmdbId);
-  const detail = (mediaType === "movie" ? movieDetail.detail : tvDetail.detail) ?? null;
-  const isPending = mediaType === "movie" ? movieDetail.isPending : tvDetail.isPending;
+  const { data: detail, isPending } = useDetail(tmdbId, mediaType);
   const { trailer } = useVideos(tmdbId, mediaType);
   const { cast } = useCredits(tmdbId, mediaType);
   const { similar } = useSimilar(tmdbId, mediaType);
