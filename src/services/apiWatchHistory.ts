@@ -6,12 +6,10 @@ import {
   query,
   orderBy,
   limit,
-  getDoc,
   getDocs,
   Timestamp,
   deleteDoc,
 } from "firebase/firestore";
-import { Movie } from "types";
 export type WatchHistoryEntry = {
   tmdbId: number;
   title: string;
