@@ -89,7 +89,7 @@ function DetailPage() {
             <span className="rounded bg-yellow-500 px-2 py-0.5 text-sm font-bold text-black">
               {detail.vote_average?.toFixed(1) || "N/A"}
             </span>
-            <span>{year}</span>
+            <span className="rounded bg-white/10 px-2 py-0.5 text-sm font-semibold">{year}</span>
             {detail.runtime && <span>{detail.runtime} min</span>}
             {detail.number_of_seasons && (
               <span>{detail.number_of_seasons} seasons</span>
