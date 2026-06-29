@@ -61,19 +61,16 @@ function MovieCard({ movie }: MoviesProps) {
       </div>
 
       <div className="mt-2 flex flex-col gap-1">
-        <div className="flex items-center gap-2 text-xs font-normal text-white opacity-80 lg:text-[0.9375rem]">
-          <p>{year}</p>
-          <span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="3"
-              height="3"
-              viewBox="0 0 3 3"
-              fill="none"
-            >
-              <circle opacity="0.5" cx="1.5" cy="1.5" r="1.5" fill="white" />
-            </svg>
+        <div className="flex items-center gap-2">
+          <p className="text-[0.875rem] font-normal text-white lg:text-2xl">
+            {title}
+          </p>
+          <span className="rounded bg-white/10 px-2 py-0.5 text-xs font-semibold text-white/80">
+            {year}
           </span>
+        </div>
+
+        <div className="flex items-center gap-2 text-xs font-normal text-white opacity-80 lg:text-[0.9375rem]">
           <p className="flex items-center gap-[0.38rem]">
             <span>
               <img
@@ -98,10 +95,6 @@ function MovieCard({ movie }: MoviesProps) {
           </svg>
           <p>{rating}</p>
         </div>
-
-        <p className="text-[0.875rem] font-normal text-white lg:text-2xl">
-          {title}
-        </p>
       </div>
     </div>
   );
