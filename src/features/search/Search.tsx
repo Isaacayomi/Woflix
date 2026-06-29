@@ -6,7 +6,7 @@ function Search() {
   const location = useLocation();
   const [value, setValue] = useState(searchParams.get("q") || "");
   const [holder, setHolder] = useState("");
-  const isDetailRoute = location.pathname.match(/^\/(movie|tv)\/\d+$/);
+  const isDetailRoute = location.pathname.match(/^\/(movie|tv)\/\d+$|^\/history$/);
 
   // Sync from URL when navigating to a new page
   useEffect(() => {
