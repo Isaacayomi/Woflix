@@ -7,6 +7,7 @@ import { useSimilar } from "../../hooks/useSimilar";
 import { useRecommendations } from "../../hooks/useRecommendations";
 import { imageUrl } from "../../lib/tmdb";
 import { getStreamUrl } from "../../lib/streamProvider";
+import { updateWatchProgress } from "../../services/apiWatchHistory";
 import MovieCard from "../../ui/MovieCard";
 import Spinner from "../../ui/Spinner";
 import CastRow from "./CastRow";
@@ -114,7 +115,17 @@ function DetailPage() {
 
           <div className="mt-6 flex flex-wrap gap-4">
             <button
-              onClick={() => setMode("watch")}
+              onClick={() => {
+                updateWatchProgress(tmdbId, {
+                  title,
+                  category: mediaType === "movie" ? "movie" : "tv series",
+                  posterPath: detail.poster_path,
+                  backdropPath: detail.backdrop_path,
+                  progress: 0,
+                  ...(mediaType === "tv" ? { season, episode } : {}),
+                });
+                setMode("watch");
+              }}
               className="flex items-center gap-2 rounded-full bg-red px-6 py-3 hover:bg-red/80"
             >
               <svg
