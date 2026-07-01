@@ -51,7 +51,10 @@ export async function getWatchHistory(
   const q = query(ref, orderBy("watchedAt", "desc"), limit(limitCount));
   const snap = await getDocs(q);
 
-  return snap.docs.map((d) => d.data() as WatchHistoryEntry);
+  return snap.docs.map((d) => ({
+    ...(d.data() as WatchHistoryEntry),
+    tmdbId: Number(d.id),
+  }));
 }
 
 export async function removeFromHistory(tmdbId: number): Promise<void> {
