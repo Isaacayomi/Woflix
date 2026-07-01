@@ -1,36 +1,94 @@
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { FreeMode } from "swiper/modules";
 import { useHomeMovies } from "../../hooks/useHomeMovies";
+import { useHeroMovies } from "../../hooks/useHeroMovies";
 import { useTopRated } from "../../hooks/useTopRated";
-import { useNewReleases } from "../../hooks/useNewReleases";
+import { useContinueWatching } from "../../hooks/useContinueWatching";
+import { useUpcoming } from "../../hooks/useUpcoming";
+import { useTrendingMovies } from "../../hooks/useTrendingMovie";
+import { useGenres } from "../../hooks/useGenres";
+import { useRecentlyViewed } from "../../hooks/useRecentlyViewed";
+import { useRecommended } from "../../hooks/useRecommended";
 import Heading from "../../ui/Heading";
 import MovieCard from "../../ui/MovieCard";
 import TrendingMovies from "./TrendingMovie";
+import ContinueWatchingCard from "./ContinueWatchingCard";
+import GenreMovieRow from "./GenreMovieRow";
+import HeroSection from "./HeroSection";
+import { imageUrl } from "../../lib/tmdb";
 import MovieCardSkeleton from "../../ui/skeletons/MovieCardSkeleton";
 import TrendingSkeleton from "../../ui/skeletons/TrendingSkeleton";
+import HeroSkeleton from "../../ui/skeletons/HeroSkeleton";
+
+const POPULAR_GENRES = [28, 12, 35, 18, 10749, 14, 27, 878];
 
 function Home() {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const query = searchParams.get("q") || "";
   const { allMovies, isPending, isFetching } = useHomeMovies(query);
+  const { heroMovies, isPending: heroPending } = useHeroMovies();
   const { topMovies, isPending: topPending } = useTopRated();
-  const { newMovies, isPending: newPending } = useNewReleases();
+  const { continueWatching, isPending: cwPending } = useContinueWatching();
+  const { upcomingMovies, isPending: upPending } = useUpcoming();
+  const { movieGenres } = useGenres();
+  const { recentlyViewed } = useRecentlyViewed();
+  const { recommended, isPending: recPending, hasBookmarks } = useRecommended();
+  const { trendingMovies } = useTrendingMovies();
+
+  const handleFeelingLucky = () => {
+    if (!trendingMovies?.length) return;
+    const pick = trendingMovies[Math.floor(Math.random() * trendingMovies.length)];
+    navigate(`/movie/${pick.id}`);
+  };
+
+  const genreRows = movieGenres
+    .filter((g) => POPULAR_GENRES.includes(g.id))
+    .slice(0, 6);
 
   return (
     <div className="h-screen">
       {!query && (
         <>
+          {heroPending ? (
+            <HeroSkeleton />
+          ) : (
+            <HeroSection heroMovies={heroMovies} />
+          )}
+
+          {/* Feeling Lucky */}
+          <div className="flex justify-end px-6 pb-4 md:px-12">
+            <button
+              onClick={handleFeelingLucky}
+              disabled={!trendingMovies?.length}
+              className="flex items-center gap-2 rounded-full bg-gradient-to-r from-red to-red/70 px-5 py-2 text-sm font-medium text-white shadow-lg transition hover:scale-105 hover:from-red/90 hover:to-red/60 disabled:opacity-50"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+              </svg>
+              Feeling Lucky
+            </button>
+          </div>
+
           {isPending ? (
-            <div className="pb-6">
+            <div className="pb-6 pt-6">
               <Heading>Trending</Heading>
               <TrendingSkeleton />
             </div>
           ) : (
-            <>
+            <div className="pb-6 pt-6">
               <Heading>Trending</Heading>
-              <div className="flex pb-6">
+              <div className="flex">
                 <TrendingMovies />
               </div>
-            </>
+            </div>
           )}
 
           {topPending ? (
@@ -53,50 +111,115 @@ function Home() {
             </div>
           ) : null}
 
-          {newPending ? (
+          {!cwPending && continueWatching.length > 0 && (
             <div className="pb-6">
-              <Heading>New Releases</Heading>
+              <Heading>Continue Watching</Heading>
+              <Swiper
+                modules={[FreeMode]}
+                spaceBetween={16}
+                freeMode
+                grabCursor
+                breakpoints={{
+                  320: { slidesPerView: 1.5, spaceBetween: 8 },
+                  640: { slidesPerView: 2.5, spaceBetween: 16 },
+                  1024: { slidesPerView: 3.5, spaceBetween: 16 },
+                }}
+              >
+                {continueWatching.map((entry) => (
+                  <SwiperSlide key={entry.tmdbId}>
+                    <ContinueWatchingCard entry={entry} />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            </div>
+          )}
+
+          {/* Upcoming */}
+          {upPending ? (
+            <div className="pb-6">
+              <Heading>Coming Soon</Heading>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {[1, 2, 3, 4, 5, 6].map((i) => (
                   <MovieCardSkeleton key={i} />
                 ))}
               </div>
             </div>
-          ) : newMovies.length > 0 ? (
+          ) : upcomingMovies.length > 0 ? (
             <div className="pb-6">
-              <Heading>New Releases</Heading>
+              <Heading>Coming Soon</Heading>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {newMovies.slice(0, 6).map((m) => (
+                {upcomingMovies.slice(0, 6).map((m) => (
                   <MovieCard movie={m} key={m.id} />
                 ))}
               </div>
             </div>
           ) : null}
+
+          {/* Recently Viewed */}
+          {recentlyViewed.length > 0 && (
+            <div className="pb-6">
+              <Heading>Recently Viewed</Heading>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {recentlyViewed.map((item) => (
+                  <MovieCard
+                    movie={{
+                      id: item.tmdbId,
+                      title: item.title,
+                      year: "",
+                      category: item.mediaType === "movie" ? "movie" : "tv series",
+                      rating: "N/A",
+                      thumbnail: {
+                        regular: {
+                          small: imageUrl(item.posterPath, "w185"),
+                          medium: imageUrl(item.posterPath, "w342"),
+                          large: imageUrl(item.posterPath, "w500"),
+                        },
+                      },
+                      isBookmarked: false,
+                    }}
+                    key={item.tmdbId}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Recommended For You */}
+          {hasBookmarks && !recPending && recommended.length > 0 && (
+            <div className="pb-6">
+              <Heading>Recommended For You</Heading>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {recommended.slice(0, 6).map((m) => (
+                  <MovieCard movie={m} key={m.id} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {genreRows.map((genre) => (
+            <GenreMovieRow key={genre.id} genreId={genre.id} genreName={genre.name} />
+          ))}
         </>
       )}
 
-      <Heading>{`${query ? `Found ${allMovies?.length ?? 0} results for "${query}"` : "Recommended for you"}`}</Heading>
+      {query && (
+        <>
+          <Heading>{`Found ${allMovies?.length ?? 0} results for "${query}"`}</Heading>
 
-      {query && isFetching && (
-        <p className="mb-4 text-sm text-grayishBlue">Updating results...</p>
+          {isFetching && (
+            <p className="mb-4 text-sm text-grayishBlue">Updating results...</p>
+          )}
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {allMovies?.length === 0 && !isPending && <p>No results found</p>}
+            {allMovies
+              ?.filter(Boolean)
+              .map((movie) => (
+                <MovieCard movie={movie} key={movie.id} />
+              ))}
+          </div>
+        </>
       )}
-
-      {isPending && !query && (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <MovieCardSkeleton key={i} />
-          ))}
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {allMovies?.length === 0 && !isPending && <p>No results found</p>}
-        {allMovies
-          ?.filter(Boolean)
-          .map((movie) => (
-            <MovieCard movie={movie} key={movie.id} />
-          ))}
-      </div>
     </div>
   );
 }

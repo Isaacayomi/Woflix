@@ -14,7 +14,7 @@ function TrendingMovie() {
     <Swiper
       modules={[Autoplay, FreeMode]}
       spaceBetween={32}
-      freeMode
+      grabCursor
       loop
       autoplay={{
         delay: 3000,
@@ -25,9 +25,9 @@ function TrendingMovie() {
         640: { slidesPerView: 2.2, spaceBetween: 12 },
       }}
     >
-      {trendingMovies?.map((movie) => (
+      {trendingMovies?.map((movie, i) => (
         <SwiperSlide key={movie.id}>
-          <TrendingMovieCard movie={movie} />
+          <TrendingMovieCard movie={movie} index={i} />
         </SwiperSlide>
       ))}
     </Swiper>

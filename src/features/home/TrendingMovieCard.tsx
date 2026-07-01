@@ -6,9 +6,10 @@ import Playicon from "../../ui/Playicon";
 
 type TrendingMovieCardProps = {
   movie: Movie;
+  index: number;
 };
 
-function TrendingMovieCard({ movie }: TrendingMovieCardProps) {
+function TrendingMovieCard({ movie, index }: TrendingMovieCardProps) {
   const navigate = useNavigate();
   const { bookmarked, handleClick, isPending } = useBookmark(movie);
 
@@ -34,6 +35,10 @@ function TrendingMovieCard({ movie }: TrendingMovieCardProps) {
           }}
           className="transition duration-300 group-hover:flex"
         />
+      </div>
+
+      <div className="absolute left-2 top-2 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-red/80 text-lg font-bold text-white md:left-4 md:top-4 md:h-12 md:w-12 md:text-2xl">
+        {index + 1}
       </div>
 
       <div
