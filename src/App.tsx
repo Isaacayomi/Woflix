@@ -3,6 +3,12 @@ import Home from "./features/home/Home";
 import Movies from "./features/movies/Movies";
 import Series from "./features/series/Series";
 import Bookmark from "./features/bookmarks/Bookmark";
+import CategoriesPage from "./features/categories/CategoriesPage";
+import CategoryResults from "./features/categories/CategoryResults";
+import DecadeResults from "./features/browse/DecadeResults";
+import LanguageResults from "./features/browse/LanguageResults";
+import PlatformResults from "./features/platforms/PlatformResults";
+import CollectionPage from "./features/collection/CollectionPage";
 import DetailPage from "./features/detail/DetailPage";
 import AppLayout from "./ui/AppLayout";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -45,6 +51,12 @@ function App() {
             <Route element={<Movies />} path="movies" />
             <Route element={<Series />} path="series" />
             <Route element={<Bookmark />} path="bookmarks" />
+            <Route element={<CategoriesPage />} path="categories" />
+            <Route element={<CategoryResults />} path="categories/:genreId" />
+            <Route element={<DecadeResults />} path="browse/decade/:year" />
+            <Route element={<LanguageResults />} path="browse/language/:code" />
+            <Route element={<PlatformResults />} path="platform/:providerId" />
+            <Route element={<CollectionPage />} path="collection/:id" />
             <Route element={<DetailPage />} path="movie/:id" />
             <Route element={<DetailPage />} path="tv/:id" />
             <Route element={<History />} path="history" />
