@@ -99,6 +99,12 @@ export type TMDBDetail = {
     vote_average: number;
   }[];
   spoken_languages: { english_name: string; iso_639_1: string }[];
+  belongs_to_collection?: {
+    id: number;
+    name: string;
+    poster_path: string | null;
+    backdrop_path: string | null;
+  } | null;
 };
 
 export type TMDBVideo = {
@@ -157,6 +163,31 @@ export type TMDBWatchProvidersResponse = {
     };
     [country: string]: unknown;
   };
+};
+
+export type TMDBEpisode = {
+  id: number;
+  name: string;
+  overview: string;
+  still_path: string | null;
+  air_date: string | null;
+  episode_number: number;
+  season_number: number;
+  runtime: number | null;
+  vote_average: number;
+  vote_count: number;
+};
+
+export type TMDBSeasonDetail = {
+  _id: string;
+  air_date: string | null;
+  name: string;
+  overview: string;
+  id: number;
+  poster_path: string | null;
+  season_number: number;
+  vote_average: number;
+  episodes: TMDBEpisode[];
 };
 
 export type TMDBCollection = {
