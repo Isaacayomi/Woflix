@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import { useDetail } from "../../hooks/useDetail";
 import { useVideos } from "../../hooks/useVideos";
 import { useCredits } from "../../hooks/useCredits";
@@ -8,9 +9,19 @@ import { useRecommendations } from "../../hooks/useRecommendations";
 import { imageUrl } from "../../lib/tmdb";
 import { getStreamUrl } from "../../lib/streamProvider";
 import { updateWatchProgress } from "../../services/apiWatchHistory";
+import {
+  getReminder,
+  setReminder,
+  removeReminder,
+} from "../../services/apiReminders";
+import { useCertification } from "../../hooks/useCertification";
+import { useRecentlyViewed } from "../../hooks/useRecentlyViewed";
+import { useRating } from "../../hooks/useRating";
 import MovieCard from "../../ui/MovieCard";
 import Spinner from "../../ui/Spinner";
 import CastRow from "./CastRow";
+import EpisodeList from "./EpisodeList";
+import StarRating from "./StarRating";
 import VideoModal from "./VideoModal";
 
 function DetailPage() {
@@ -24,11 +35,62 @@ function DetailPage() {
   const { cast } = useCredits(tmdbId, mediaType);
   const { similar } = useSimilar(tmdbId, mediaType);
   const { recommendations } = useRecommendations(tmdbId, mediaType);
+  const { certification } = useCertification(tmdbId);
+  const { add: addRecentlyViewed } = useRecentlyViewed();
+  const {
+    rating: userRating,
+    setRating: setUserRating,
+    removeRating: removeUserRating,
+    isPending: ratingPending,
+  } = useRating(tmdbId);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!tmdbId || !detail) return;
+    addRecentlyViewed({
+      tmdbId,
+      title: detail.title || detail.name || "",
+      mediaType: mediaType === "movie" ? "movie" : "tv",
+      posterPath: detail.poster_path,
+    });
+  }, [tmdbId, detail, mediaType, addRecentlyViewed]);
 
   const [mode, setMode] = useState<"hero" | "watch">("hero");
   const [season, setSeason] = useState(1);
   const [episode, setEpisode] = useState(1);
   const [muted, setMuted] = useState(false);
+  const [isReminded, setIsReminded] = useState(false);
+  const [isLoadingReminder, setIsLoadingReminder] = useState(false);
+
+  useEffect(() => {
+    if (!tmdbId) return;
+    getReminder(tmdbId).then((r) => setIsReminded(!!r));
+  }, [tmdbId]);
+
+  const handleToggleReminder = async () => {
+    if (isLoadingReminder) return;
+    setIsLoadingReminder(true);
+    try {
+      if (isReminded) {
+        await removeReminder(tmdbId);
+        setIsReminded(false);
+      } else {
+        await setReminder({
+          tmdbId,
+          title,
+          mediaType,
+          releaseDate: detail?.release_date || detail?.first_air_date || "",
+          posterPath: detail?.poster_path ?? null,
+          createdAt: Date.now(),
+        });
+        setIsReminded(true);
+      }
+    } catch {
+      // silently fail
+    } finally {
+      setIsLoadingReminder(false);
+    }
+  };
 
   const trailerKey = trailer?.key;
   const backdropImage = detail?.backdrop_path
@@ -37,15 +99,19 @@ function DetailPage() {
 
   const heroVideoUrl =
     trailerKey && mode === "hero"
-      ? `https://www.youtube.com/embed/${trailerKey}?autoplay=1&mute=${muted ? 1 : 0}&loop=1&controls=0&playlist=${trailerKey}&rel=0&showinfo=0`
+      ? `https://www.youtube.com/embed/${trailerKey}?autoplay=1&mute=${muted ? 1 : 0}&loop=1&controls=0&playlist=${trailerKey}&rel=0&showinfo=0&modestbranding=1&iv_load_policy=3`
       : null;
 
   const streamUrl = getStreamUrl(mediaType, tmdbId, season, episode);
 
   const airedSeasons = detail?.seasons?.filter(
-    (s) => s.air_date && s.episode_count > 0,
+    (s) => s.air_date && s.episode_count > 0 && s.season_number > 0,
   ) ?? [];
-  const maxEpisodes = 24;
+
+  const handleSelectEpisode = (ep: { episode_number: number }) => {
+    setEpisode(ep.episode_number);
+    setMode("watch");
+  };
 
   if (isPending) return <Spinner />;
   if (!detail)
@@ -57,15 +123,21 @@ function DetailPage() {
 
   const title = detail.title || detail.name || "";
   const year = (detail.release_date || detail.first_air_date || "").slice(0, 4);
+  const releaseDate = detail.release_date || detail.first_air_date || "";
+  const isUnreleased =
+    mediaType === "tv"
+      ? !airedSeasons.some((s) => s.season_number === season)
+      : detail.status !== "Released" ||
+        (releaseDate ? new Date(releaseDate) > new Date() : false);
 
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <div className="relative h-screen w-full overflow-hidden">
+      <div className="fixed inset-0 z-10 h-screen bg-darkBlue">
         {heroVideoUrl ? (
           <iframe
             key={String(muted)}
-            className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-70"
+            className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-100"
             src={heroVideoUrl}
             title={title}
             allow="autoplay"
@@ -84,7 +156,27 @@ function DetailPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-darkBlue via-darkBlue/70 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-r from-darkBlue/50 to-transparent" />
 
-        <div className="relative z-10 flex h-full flex-col justify-end p-6 pb-16 md:p-12">
+        <button
+          onClick={() => navigate(-1)}
+          className="absolute left-6 top-6 z-30 flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm hover:bg-black/70"
+          aria-label="Go back"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        </button>
+
+        <div className="relative z-10 flex h-full flex-col justify-end p-6 pb-[10vh] md:p-12">
           <h1 className="text-4xl font-bold md:text-6xl">{title}</h1>
 
           <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-white/80">
@@ -92,6 +184,11 @@ function DetailPage() {
               {detail.vote_average?.toFixed(1) || "N/A"}
             </span>
             <span className="rounded bg-white/10 px-2 py-0.5 text-sm font-semibold">{year}</span>
+            {certification && (
+              <span className="rounded border border-white/20 px-2 py-0.5 text-[11px] font-semibold uppercase">
+                {certification}
+              </span>
+            )}
             {detail.runtime && <span>{detail.runtime} min</span>}
             {detail.number_of_seasons && (
               <span>{detail.number_of_seasons} seasons</span>
@@ -113,130 +210,275 @@ function DetailPage() {
             {detail.overview}
           </p>
 
-          <CastRow cast={cast} />
-
-          <div className="mt-6 flex flex-wrap gap-4">
+          {detail.belongs_to_collection && (
             <button
-              onClick={() => {
-                updateWatchProgress(tmdbId, {
-                  title,
-                  category: mediaType === "movie" ? "movie" : "tv series",
-                  posterPath: detail.poster_path,
-                  backdropPath: detail.backdrop_path,
-                  progress: 0,
-                  ...(mediaType === "tv" ? { season, episode } : {}),
-                });
-                setMode("watch");
-              }}
-              className="flex items-center gap-2 rounded-full bg-red px-6 py-3 hover:bg-red/80"
+              onClick={() =>
+                navigate(
+                  `/collection/${detail.belongs_to_collection!.id}?name=${encodeURIComponent(detail.belongs_to_collection!.name)}`,
+                )
+              }
+              className="mt-3 flex items-center gap-2 text-sm text-white/60 hover:text-white"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
+                width="16"
+                height="16"
                 viewBox="0 0 24 24"
-                fill="currentColor"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               >
-                <path d="M8 5v14l11-7z" />
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
               </svg>
-              <span className="text-sm font-medium">Watch Now</span>
+              Part of{" "}
+              <span className="font-medium text-red">
+                {detail.belongs_to_collection.name}
+              </span>
+              <span className="text-xs text-white/40">&rarr;</span>
             </button>
+          )}
+
+          <CastRow cast={cast} />
+
+          {/* User rating */}
+          <div className="mt-4">
+            <span className="mr-3 text-xs text-white/50">Your Rating</span>
+            <StarRating
+              rating={userRating}
+              onRate={(r) =>
+                setUserRating({
+                  rating: r,
+                  title,
+                  posterPath: detail.poster_path,
+                })
+              }
+              onRemove={removeUserRating}
+              disabled={ratingPending}
+            />
+          </div>
+
+          <div className="mt-6 flex flex-wrap gap-4">
+            {isUnreleased ? (
+              <>
+                <span className="flex items-center gap-2 rounded-full border border-white/25 px-6 py-3 text-sm text-white/60">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                  </svg>
+                  Coming Soon
+                </span>
+                <button
+                  onClick={handleToggleReminder}
+                  disabled={isLoadingReminder}
+                  className="flex items-center gap-2 rounded-full bg-white/10 px-6 py-3 text-sm hover:bg-white/20 disabled:opacity-50"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill={isReminded ? "currentColor" : "none"}
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                    <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                  </svg>
+                  {isReminded ? "Reminded" : "Remind Me"}
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => {
+                  updateWatchProgress(tmdbId, {
+                    title,
+                    category: mediaType === "movie" ? "movie" : "tv series",
+                    posterPath: detail.poster_path,
+                    backdropPath: detail.backdrop_path,
+                    progress: 0,
+                    ...(mediaType === "tv" ? { season, episode } : {}),
+                  });
+                  setMode("watch");
+                }}
+                className="flex items-center gap-2 rounded-full bg-red px-6 py-3 hover:bg-red/80"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+                <span className="text-sm font-medium">Watch Now</span>
+              </button>
+            )}
             {mediaType === "tv" && (
-              <div className="flex items-center gap-4">
-                <div className="relative">
-                  <select
-                    value={season}
-                    onChange={(e) => {
-                      setSeason(Number(e.target.value));
-                      setEpisode(1);
-                    }}
-                    className="appearance-none rounded-full bg-white/10 py-2 pl-4 pr-10 text-sm hover:bg-white/20 focus:outline-none"
-                  >
-                    {airedSeasons.map((s) => (
-                      <option
-                        key={s.season_number}
-                        value={s.season_number}
-                        className="bg-darkBlue text-white"
-                      >
-                        Season {s.season_number}
-                      </option>
-                    ))}
-                  </select>
-                  <svg
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/70"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08Z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-                <div className="relative">
-                  <select
-                    value={episode}
-                    onChange={(e) => setEpisode(Number(e.target.value))}
-                    className="appearance-none rounded-full bg-white/10 py-2 pl-4 pr-10 text-sm hover:bg-white/20 focus:outline-none"
-                  >
-                    {Array.from({ length: maxEpisodes }, (_, i) => i + 1).map((e) => (
-                      <option key={e} value={e} className="bg-darkBlue text-white">
-                        Ep. {e}
-                      </option>
-                    ))}
-                  </select>
-                  <svg
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/70"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08Z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
+              <div className="relative">
+                <select
+                  value={season}
+                  onChange={(e) => {
+                    setSeason(Number(e.target.value));
+                    setEpisode(1);
+                  }}
+                  className="appearance-none rounded-full bg-white/10 py-2 pl-4 pr-10 text-sm hover:bg-white/20 focus:outline-none"
+                >
+                  {airedSeasons.map((s) => (
+                    <option
+                      key={s.season_number}
+                      value={s.season_number}
+                      className="bg-darkBlue text-white"
+                    >
+                      Season {s.season_number}
+                    </option>
+                  ))}
+                </select>
+                <svg
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/70"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08Z"
+                    clipRule="evenodd"
+                  />
+                </svg>
               </div>
+            )}
+
+            {/* Share */}
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(window.location.href);
+                toast.success("Link copied to clipboard", {
+                  style: { fontSize: "0.875rem", textAlign: "center" },
+                });
+              }}
+              className="flex items-center gap-2 rounded-full bg-white/10 px-4 py-3 text-sm hover:bg-white/20"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="18" cy="5" r="3" />
+                <circle cx="6" cy="12" r="3" />
+                <circle cx="18" cy="19" r="3" />
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+              </svg>
+              Share
+            </button>
+
+            {/* Mark as Watched */}
+            {!isUnreleased && (
+              <button
+                onClick={() => {
+                  updateWatchProgress(tmdbId, {
+                    title,
+                    category: mediaType === "movie" ? "movie" : "tv series",
+                    posterPath: detail.poster_path,
+                    backdropPath: detail.backdrop_path,
+                    progress: 100,
+                    ...(mediaType === "tv" ? { season, episode } : {}),
+                  });
+                  toast.success("Marked as watched", {
+                    style: { fontSize: "0.875rem", textAlign: "center" },
+                  });
+                }}
+                className="flex items-center gap-2 rounded-full bg-white/10 px-4 py-3 text-sm hover:bg-white/20"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                Watched
+              </button>
             )}
           </div>
         </div>
       </div>
 
-      {/* Similar */}
-      {similar.length > 0 && (
-        <section className="px-6 pb-8 md:px-12">
-          <h2 className="mb-4 text-xl font-semibold">More Like This</h2>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-            {similar.map((m) => (
-              <MovieCard movie={m} key={m.id} />
-            ))}
-          </div>
-        </section>
-      )}
+      <div className="h-screen" />
 
-      {/* Recommendations */}
-      {recommendations.length > 0 && (
-        <section className="px-6 pb-12 md:px-12">
-          <h2 className="mb-4 text-xl font-semibold">Recommendations</h2>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-            {recommendations.map((m) => (
-              <MovieCard movie={m} key={m.id} />
-            ))}
-          </div>
-        </section>
-      )}
+      <div className="relative z-20 bg-darkBlue">
+        {/* Episode Guide */}
+        {mediaType === "tv" && (
+          <section className="px-6 pb-8 pt-6 md:px-12">
+            <h2 className="mb-4 text-xl font-semibold">
+              Episodes — Season {season}
+            </h2>
+            <EpisodeList
+              seriesId={tmdbId}
+              seasonNumber={season}
+              onSelectEpisode={handleSelectEpisode}
+            />
+          </section>
+        )}
+
+        {/* Similar */}
+        {similar.length > 0 && (
+          <section className="px-6 pb-8 md:px-12">
+            <h2 className="mb-4 text-xl font-semibold">More Like This</h2>
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+              {similar.map((m) => (
+                <MovieCard movie={m} key={m.id} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Recommendations */}
+        {recommendations.length > 0 && (
+          <section className="px-6 pb-12 md:px-12">
+            <h2 className="mb-4 text-xl font-semibold">Recommendations</h2>
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+              {recommendations.map((m) => (
+                <MovieCard movie={m} key={m.id} />
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
 
       {/* Sound toggle */}
       {mode === "hero" && trailerKey && (
         <button
           onClick={() => setMuted((m) => !m)}
-          className="fixed bottom-8 right-8 z-20 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20"
+          className="fixed bottom-20 right-8 z-20 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 lg:bottom-8"
         >
           {muted ? (
             <svg
