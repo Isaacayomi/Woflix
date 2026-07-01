@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getBookmark } from "../../services/apiBookmark";
@@ -5,9 +6,12 @@ import MovieCard from "../../ui/MovieCard";
 import Heading from "../../ui/Heading";
 import Spinner from "../../ui/Spinner";
 
+type Tab = "all" | "movie" | "tv series";
+
 function Bookmark() {
   const [searchParams] = useSearchParams();
   const query = searchParams.get("q") || "";
+  const [tab, setTab] = useState<Tab>("all");
 
   const { data: isBookmarked, isPending } = useQuery({
     queryKey: ["bookmarkedMovies"],
@@ -16,40 +20,79 @@ function Bookmark() {
 
   const normalizedQuery = query.trim().toLowerCase();
 
+  const allBookmarked = isBookmarked || [];
+
   const displayedMovies = normalizedQuery
-    ? (isBookmarked || []).filter((movie) =>
+    ? allBookmarked.filter((movie) =>
         movie.title.toLowerCase().includes(normalizedQuery),
       )
-    : isBookmarked;
+    : tab === "all"
+      ? allBookmarked
+      : allBookmarked.filter((m) => m.category === tab);
+
+  const movieCount = allBookmarked.filter((m) => m.category === "movie").length;
+  const seriesCount = allBookmarked.filter((m) => m.category === "tv series").length;
+
+  if (isPending) return <Spinner />;
+
+  if (allBookmarked.length === 0 && !query) {
+    return (
+      <div className="h-screen">
+        <Heading>Bookmarked TV Series</Heading>
+        <div className="mt-16 flex flex-col items-center gap-4 text-center">
+          <img
+            src="/assets/icon-nav-bookmark.svg"
+            alt="bookmark"
+            className="h-16 w-16 opacity-30"
+          />
+          <p className="text-lg text-grayishBlue">Your list is empty</p>
+          <p className="text-sm text-grayishBlue/60">
+            Bookmark movies and TV series to see them here
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen">
-      {isPending && <Spinner />}
-
       {!query ? (
         <Heading>Bookmarked TV Series</Heading>
       ) : (
         <Heading>{`Found ${displayedMovies?.length} results for "${query}"`}</Heading>
       )}
 
-      <div className="mb-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {displayedMovies
-          ?.filter(
-            (bookmarkedMovie) => bookmarkedMovie.category === "tv series",
-          )
-          .map((bookmarkedMovie) => (
-            <MovieCard movie={bookmarkedMovie} key={bookmarkedMovie.id} />
+      {!query && (
+        <div className="mb-6 flex gap-2">
+          {[
+            { key: "all" as Tab, label: `All (${allBookmarked.length})` },
+            { key: "movie" as Tab, label: `Movies (${movieCount})` },
+            { key: "tv series" as Tab, label: `Series (${seriesCount})` },
+          ].map((t) => (
+            <button
+              key={t.key}
+              onClick={() => setTab(t.key)}
+              className={`rounded-full px-3 py-1 text-sm transition-colors ${
+                tab === t.key
+                  ? "bg-red text-white"
+                  : "bg-semiDarkBlue text-white hover:bg-white/20"
+              }`}
+            >
+              {t.label}
+            </button>
           ))}
-      </div>
-
-      {!query && <Heading>Bookmarked Movie</Heading>}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {displayedMovies
-          ?.filter((bookmarkedMovie) => bookmarkedMovie.category === "movie")
-          .map((bookmarkedMovie) => (
-            <MovieCard movie={bookmarkedMovie} key={bookmarkedMovie.id} />
-          ))}
+        {displayedMovies.map((bookmarkedMovie) => (
+          <MovieCard movie={bookmarkedMovie} key={bookmarkedMovie.id} />
+        ))}
+        {displayedMovies.length === 0 && (
+          <p className="col-span-full text-center text-grayishBlue">
+            No bookmarked {tab === "all" ? "items" : tab === "movie" ? "movies" : "series"} found
+          </p>
+        )}
       </div>
     </div>
   );
