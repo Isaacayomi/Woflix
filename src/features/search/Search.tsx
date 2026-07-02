@@ -24,6 +24,8 @@ function Search() {
     if (path === "/") setHolder("Search for movies or TV series");
     else if (path === "/movies") setHolder("Search for movies");
     else if (path === "/series") setHolder("Search for TV series");
+    else if (path.match(/^\/(categories\/\d+|browse\/|platform\/|collection\/)/))
+      setHolder("Search for Movies/Shows");
     else setHolder("Search for Bookmarked Shows");
   }, [location.pathname]);
 

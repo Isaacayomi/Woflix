@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import type { HeroMovie } from "../../hooks/useHeroMovies";
 import { imageUrl } from "../../lib/tmdb";
+import { isUnreleased } from "../../lib/releaseStatus";
 
 declare global {
   interface Window {
@@ -114,9 +115,7 @@ function HeroSection({ heroMovies }: { heroMovies: HeroMovie[] }) {
 
   if (heroMovies.length === 0) return null;
 
-  const isUnreleased =
-    current.status !== "Released" ||
-    (current.releaseDate ? new Date(current.releaseDate) > new Date() : false);
+  const unreleased = isUnreleased(current.status, current.releaseDate);
 
   const backdrop =
     current.movie.thumbnail.trending?.large ||
@@ -175,7 +174,7 @@ function HeroSection({ heroMovies }: { heroMovies: HeroMovie[] }) {
         </p>
 
         <div className="mt-5 flex flex-wrap gap-4">
-          {isUnreleased ? (
+          {unreleased ? (
             <>
               <span className="flex items-center gap-2 rounded-full border border-white/25 px-6 py-3 text-sm text-white/60">
                 <svg
