@@ -123,7 +123,7 @@ function Home() {
                 spaceBetween={16}
                 freeMode
                 grabCursor
-                style={{ overflow: "visible" }}
+                className="-my-2 py-2"
                 breakpoints={{
                   320: { slidesPerView: 1.5, spaceBetween: 8, slidesOffsetAfter: 16 },
                   640: { slidesPerView: 2.5, spaceBetween: 16, slidesOffsetAfter: 32 },

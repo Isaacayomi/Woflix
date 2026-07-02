@@ -66,7 +66,7 @@ function AppLayout() {
 
             <main
               ref={mainRef}
-              className="overflow-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              className="overflow-y-auto overflow-x-hidden [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             >
               <AnimatePresence mode="wait">
                 <motion.div

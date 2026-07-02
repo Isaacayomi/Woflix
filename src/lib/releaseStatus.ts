@@ -1,8 +1,8 @@
-export const RELEASED_STATUSES = [
-  "Released",
-  "Returning Series",
-  "Ended",
-  "Canceled",
+export const UNRELEASED_STATUSES = [
+  "Planned",
+  "Rumored",
+  "In Production",
+  "Post Production",
 ];
 
 export function isUnreleased(
@@ -10,9 +10,7 @@ export function isUnreleased(
   releaseDate: string,
 ): boolean {
   if (!status) return false;
-  return RELEASED_STATUSES.includes(status)
-    ? releaseDate
-      ? new Date(releaseDate) > new Date()
-      : false
-    : true;
+  if (releaseDate && new Date(releaseDate) > new Date()) return true;
+  if (UNRELEASED_STATUSES.includes(status)) return true;
+  return false;
 }
