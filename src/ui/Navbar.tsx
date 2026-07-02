@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useLogout } from "../hooks/useLogout";
 
@@ -59,9 +60,15 @@ function NavIcon({ icon }: { icon: string }) {
 
 function Navbar() {
   const { logout, isPending } = useLogout();
+  const [expanded, setExpanded] = useState(false);
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around bg-semiDarkBlue px-4 py-3 lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:w-[6rem] lg:flex-shrink-0 lg:flex-col lg:justify-between lg:rounded-[1.25rem] lg:py-8 lg:overflow-hidden">
+    <nav
+      onMouseEnter={() => setExpanded(true)}
+      onMouseLeave={() => setExpanded(false)}
+      className={`fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around bg-semiDarkBlue px-4 py-3 transition-all duration-300 lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:flex-shrink-0 lg:flex-col lg:justify-between lg:rounded-[1.25rem] lg:py-8 ${
+        expanded ? "lg:w-[9rem] lg:px-5" : "lg:w-[6rem]"
+      }`}>
       <img
         src="/assets/icon-nav-movies.svg"
         alt="movies nav icon"
@@ -74,14 +81,16 @@ function Navbar() {
             key={item.to}
             to={item.to}
             className={({ isActive }) =>
-              `group relative flex items-center justify-center ${
+              `flex items-center gap-3 ${
                 isActive ? "text-white" : "text-grayishBlue"
               } transition-colors duration-200 hover:text-red focus:border-none focus:text-white focus:outline-none`
             }
             title={item.label}
           >
             <NavIcon icon={item.icon} />
-            <span className="absolute left-full ml-3 whitespace-nowrap text-xs font-medium text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+            <span className={`text-xs font-medium whitespace-nowrap ${
+              expanded ? "lg:inline" : "lg:hidden"
+            }`}>
               {item.label}
             </span>
           </NavLink>
@@ -91,7 +100,7 @@ function Navbar() {
       <div className="hidden items-center gap-3 lg:mt-auto lg:flex lg:flex-col lg:pb-12">
         <NavLink
           to="/profile"
-          className="group relative flex items-center justify-center text-grayishBlue transition-colors duration-200 hover:text-white focus:outline-none"
+          className="flex items-center justify-center text-grayishBlue transition-colors duration-200 hover:text-white focus:outline-none"
           title="Profile"
         >
           <div className="h-[2.5rem] w-[2.5rem] overflow-hidden rounded-full border border-white">
@@ -101,15 +110,12 @@ function Navbar() {
               className="h-full w-full object-cover"
             />
           </div>
-          <span className="absolute left-full ml-3 whitespace-nowrap text-xs font-medium text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-            Profile
-          </span>
         </NavLink>
 
         <button
           onClick={() => logout()}
           disabled={isPending}
-          className="group relative flex items-center justify-center text-grayishBlue transition-colors duration-200 hover:text-red focus:outline-none"
+          className="flex items-center justify-center text-grayishBlue transition-colors duration-200 hover:text-red focus:outline-none"
           title="Logout"
         >
           <svg
@@ -127,9 +133,6 @@ function Navbar() {
             <polyline points="16 17 21 12 16 7" />
             <line x1="21" y1="12" x2="9" y2="12" />
           </svg>
-          <span className="absolute left-full ml-3 whitespace-nowrap text-xs font-medium text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-            Logout
-          </span>
         </button>
       </div>
     </nav>
