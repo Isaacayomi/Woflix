@@ -1,0 +1,30 @@
+import { motion, type Variants } from "framer-motion";
+
+export const cardVariants: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
+export default function StaggerContainer({
+  children,
+  staggerMs = 0.04,
+  className,
+}: {
+  children: React.ReactNode;
+  staggerMs?: number;
+  className?: string;
+}) {
+  return (
+    <motion.div
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.05 }}
+      variants={{
+        visible: { transition: { staggerChildren: staggerMs } },
+      }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}

@@ -1,11 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useSearchParams } from "react-router-dom";
+import { motion } from "framer-motion";
 import { getCollection } from "../../services/apiCollections";
 import { imageUrl } from "../../lib/tmdb";
 import type { Movie, TMDBMovieResult } from "types";
 import Heading from "../../ui/Heading";
 import MovieCard from "../../ui/MovieCard";
 import Spinner from "../../ui/Spinner";
+import StaggerContainer, { cardVariants } from "../../ui/StaggerContainer";
 
 function mapToMovie(item: TMDBMovieResult): Movie {
   return {
@@ -75,11 +77,13 @@ function CollectionPage() {
       </div>
 
       {/* Movies grid */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <StaggerContainer className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {movies.map((movie) => (
-          <MovieCard movie={movie} key={movie.id} />
+          <motion.div key={movie.id} variants={cardVariants}>
+            <MovieCard movie={movie} />
+          </motion.div>
         ))}
-      </div>
+      </StaggerContainer>
     </div>
   );
 }

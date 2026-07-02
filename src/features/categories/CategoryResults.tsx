@@ -1,10 +1,12 @@
 import { useEffect, useRef } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
+import { motion } from "framer-motion";
 import { useMovies } from "../../hooks/useMovies";
 import Heading from "../../ui/Heading";
 import MovieCard from "../../ui/MovieCard";
 import Spinner from "../../ui/Spinner";
 import MovieCardSkeleton from "../../ui/skeletons/MovieCardSkeleton";
+import StaggerContainer, { cardVariants } from "../../ui/StaggerContainer";
 
 function CategoryResults() {
   const { genreId } = useParams<{ genreId: string }>();
@@ -57,11 +59,13 @@ function CategoryResults() {
 
       {!isPending && movies.length === 0 && <p>No results found</p>}
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <StaggerContainer className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {movies.map((movie) => (
-          <MovieCard movie={movie} key={movie.id} />
+          <motion.div key={movie.id} variants={cardVariants}>
+            <MovieCard movie={movie} />
+          </motion.div>
         ))}
-      </div>
+      </StaggerContainer>
 
       {hasNextPage && (
         <div ref={sentinelRef} className="flex justify-center py-8">

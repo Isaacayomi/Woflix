@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { useSeries } from "../../hooks/useSeries";
 import { useGenres } from "../../hooks/useGenres";
 import MovieCard from "../../ui/MovieCard";
 import Heading from "../../ui/Heading";
 import Spinner from "../../ui/Spinner";
 import MovieCardSkeleton from "../../ui/skeletons/MovieCardSkeleton";
+import StaggerContainer, { cardVariants } from "../../ui/StaggerContainer";
 
 function Series() {
   const [searchParams] = useSearchParams();
@@ -89,13 +91,25 @@ function Series() {
         </div>
       )}
 
-      {!isPending && series.length === 0 && <p>No results found</p>}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={`${genreFilter ?? "all"}-${query}`}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.2 }}
+        >
+          {!isPending && series.length === 0 && <p>No results found</p>}
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {series.map((serie) => (
-          <MovieCard movie={serie} key={serie.id} />
-        ))}
-      </div>
+          <StaggerContainer className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {series.map((serie) => (
+              <motion.div key={serie.id} variants={cardVariants}>
+                <MovieCard movie={serie} />
+              </motion.div>
+            ))}
+          </StaggerContainer>
+        </motion.div>
+      </AnimatePresence>
 
       {hasNextPage && (
         <div ref={sentinelRef} className="flex justify-center py-8">
