@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import { useDetail } from "../../hooks/useDetail";
 import { useVideos } from "../../hooks/useVideos";
@@ -7,7 +8,7 @@ import { useCredits } from "../../hooks/useCredits";
 import { useSimilar } from "../../hooks/useSimilar";
 import { useRecommendations } from "../../hooks/useRecommendations";
 import { imageUrl } from "../../lib/tmdb";
-import { getStreamUrl } from "../../lib/streamProvider";
+import { isUnreleased } from "../../lib/releaseStatus";
 import { updateWatchProgress } from "../../services/apiWatchHistory";
 import {
   getReminder,
@@ -17,12 +18,15 @@ import {
 import { useCertification } from "../../hooks/useCertification";
 import { useRecentlyViewed } from "../../hooks/useRecentlyViewed";
 import { useRating } from "../../hooks/useRating";
+import { getWatchEntry } from "../../services/apiWatchHistory";
 import MovieCard from "../../ui/MovieCard";
+import SeasonDropdown from "../../ui/SeasonDropdown";
 import Spinner from "../../ui/Spinner";
 import CastRow from "./CastRow";
 import EpisodeList from "./EpisodeList";
 import StarRating from "./StarRating";
-import VideoModal from "./VideoModal";
+import CustomVideoPlayer from "../../ui/CustomVideoPlayer";
+import StaggerContainer, { cardVariants } from "../../ui/StaggerContainer";
 
 function DetailPage() {
   const { id } = useParams();
@@ -55,12 +59,20 @@ function DetailPage() {
     });
   }, [tmdbId, detail, mediaType, addRecentlyViewed]);
 
+  useEffect(() => {
+    if (!tmdbId) return;
+    getWatchEntry(tmdbId).then((entry) => {
+      if (entry?.progress === 100) setWatched(true);
+    });
+  }, [tmdbId]);
+
   const [mode, setMode] = useState<"hero" | "watch">("hero");
   const [season, setSeason] = useState(1);
   const [episode, setEpisode] = useState(1);
   const [muted, setMuted] = useState(false);
   const [isReminded, setIsReminded] = useState(false);
   const [isLoadingReminder, setIsLoadingReminder] = useState(false);
+  const [watched, setWatched] = useState(false);
 
   useEffect(() => {
     if (!tmdbId) return;
@@ -102,8 +114,6 @@ function DetailPage() {
       ? `https://www.youtube.com/embed/${trailerKey}?autoplay=1&mute=${muted ? 1 : 0}&loop=1&controls=0&playlist=${trailerKey}&rel=0&showinfo=0&modestbranding=1&iv_load_policy=3`
       : null;
 
-  const streamUrl = getStreamUrl(mediaType, tmdbId, season, episode);
-
   const airedSeasons = detail?.seasons?.filter(
     (s) => s.air_date && s.episode_count > 0 && s.season_number > 0,
   ) ?? [];
@@ -124,24 +134,25 @@ function DetailPage() {
   const title = detail.title || detail.name || "";
   const year = (detail.release_date || detail.first_air_date || "").slice(0, 4);
   const releaseDate = detail.release_date || detail.first_air_date || "";
-  const isUnreleased =
+  const unreleased =
     mediaType === "tv"
       ? !airedSeasons.some((s) => s.season_number === season)
-      : detail.status !== "Released" ||
-        (releaseDate ? new Date(releaseDate) > new Date() : false);
+      : isUnreleased(detail.status, releaseDate);
 
   return (
     <div className="min-h-screen">
       {/* Hero */}
       <div className="fixed inset-0 z-10 h-screen bg-darkBlue">
         {heroVideoUrl ? (
-          <iframe
-            key={String(muted)}
-            className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-100"
-            src={heroVideoUrl}
-            title={title}
-            allow="autoplay"
-          />
+          <div className="pointer-events-none absolute inset-0 overflow-hidden">
+            <iframe
+              key={String(muted)}
+              className="absolute left-1/2 top-0 -translate-x-1/2 md:top-1/2 md:-translate-y-1/2 h-[56.25vw] min-h-[100vh] w-[100vw] min-w-[177.77vh]"
+              src={heroVideoUrl}
+              title={title}
+              allow="autoplay"
+            />
+          </div>
         ) : (
           <img
             src={backdropImage}
@@ -176,7 +187,7 @@ function DetailPage() {
           </svg>
         </button>
 
-        <div className="relative z-10 flex h-full flex-col justify-end p-6 pb-[10vh] md:p-12">
+        <div className="relative z-10 flex h-full flex-col justify-end max-md:justify-start p-6 pb-[10vh] md:p-12 max-md:pt-[30vh] max-md:overflow-y-auto">
           <h1 className="text-4xl font-bold md:text-6xl">{title}</h1>
 
           <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-white/80">
@@ -260,7 +271,7 @@ function DetailPage() {
           </div>
 
           <div className="mt-6 flex flex-wrap gap-4">
-            {isUnreleased ? (
+            {unreleased ? (
               <>
                 <span className="flex items-center gap-2 rounded-full border border-white/25 px-6 py-3 text-sm text-white/60">
                   <svg
@@ -329,39 +340,14 @@ function DetailPage() {
               </button>
             )}
             {mediaType === "tv" && (
-              <div className="relative">
-                <select
-                  value={season}
-                  onChange={(e) => {
-                    setSeason(Number(e.target.value));
-                    setEpisode(1);
-                  }}
-                  className="appearance-none rounded-full bg-white/10 py-2 pl-4 pr-10 text-sm hover:bg-white/20 focus:outline-none"
-                >
-                  {airedSeasons.map((s) => (
-                    <option
-                      key={s.season_number}
-                      value={s.season_number}
-                      className="bg-darkBlue text-white"
-                    >
-                      Season {s.season_number}
-                    </option>
-                  ))}
-                </select>
-                <svg
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/70"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08Z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
+              <SeasonDropdown
+                seasons={airedSeasons}
+                value={season}
+                onChange={(n) => {
+                  setSeason(n);
+                  setEpisode(1);
+                }}
+              />
             )}
 
             {/* Share */}
@@ -395,7 +381,7 @@ function DetailPage() {
             </button>
 
             {/* Mark as Watched */}
-            {!isUnreleased && (
+            {!unreleased && (
               <button
                 onClick={() => {
                   updateWatchProgress(tmdbId, {
@@ -406,18 +392,23 @@ function DetailPage() {
                     progress: 100,
                     ...(mediaType === "tv" ? { season, episode } : {}),
                   });
+                  setWatched(true);
                   toast.success("Marked as watched", {
                     style: { fontSize: "0.875rem", textAlign: "center" },
                   });
                 }}
-                className="flex items-center gap-2 rounded-full bg-white/10 px-4 py-3 text-sm hover:bg-white/20"
+                className={`flex items-center gap-2 rounded-full px-4 py-3 text-sm ${
+                  watched
+                    ? "bg-red/20 text-red border border-red/40"
+                    : "bg-white/10 text-white hover:bg-white/20"
+                }`}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"
                   height="16"
                   viewBox="0 0 24 24"
-                  fill="none"
+                  fill={watched ? "currentColor" : "none"}
                   stroke="currentColor"
                   strokeWidth="2"
                   strokeLinecap="round"
@@ -453,11 +444,13 @@ function DetailPage() {
         {similar.length > 0 && (
           <section className="px-6 pb-8 md:px-12">
             <h2 className="mb-4 text-xl font-semibold">More Like This</h2>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+            <StaggerContainer className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
               {similar.map((m) => (
-                <MovieCard movie={m} key={m.id} />
+                <motion.div key={m.id} variants={cardVariants}>
+                  <MovieCard movie={m} />
+                </motion.div>
               ))}
-            </div>
+            </StaggerContainer>
           </section>
         )}
 
@@ -465,11 +458,13 @@ function DetailPage() {
         {recommendations.length > 0 && (
           <section className="px-6 pb-12 md:px-12">
             <h2 className="mb-4 text-xl font-semibold">Recommendations</h2>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+            <StaggerContainer className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
               {recommendations.map((m) => (
-                <MovieCard movie={m} key={m.id} />
+                <motion.div key={m.id} variants={cardVariants}>
+                  <MovieCard movie={m} />
+                </motion.div>
               ))}
-            </div>
+            </StaggerContainer>
           </section>
         )}
       </div>
@@ -515,10 +510,13 @@ function DetailPage() {
         </button>
       )}
 
-      {/* Modals */}
+      {/* Custom Player */}
       {mode === "watch" && (
-        <VideoModal
-          url={streamUrl}
+        <CustomVideoPlayer
+          tmdbId={tmdbId}
+          mediaType={mediaType}
+          season={season}
+          episode={episode}
           title={title}
           onClose={() => setMode("hero")}
         />

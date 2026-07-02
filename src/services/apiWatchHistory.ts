@@ -2,6 +2,7 @@ import { db, auth } from "../lib/firebase";
 import {
   doc,
   setDoc,
+  getDoc,
   collection,
   query,
   orderBy,
@@ -63,4 +64,14 @@ export async function removeFromHistory(tmdbId: number): Promise<void> {
 
   const ref = doc(db, "users", uid, "history", String(tmdbId));
   await deleteDoc(ref);
+}
+
+export async function getWatchEntry(tmdbId: number): Promise<{ progress: number } | null> {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return null;
+
+  const ref = doc(db, "users", uid, "history", String(tmdbId));
+  const snap = await getDoc(ref);
+  if (!snap.exists()) return null;
+  return snap.data() as { progress: number };
 }
