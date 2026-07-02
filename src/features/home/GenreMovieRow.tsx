@@ -22,10 +22,11 @@ function GenreMovieRow({ genreId, genreName }: Props) {
         spaceBetween={16}
         freeMode
         grabCursor
+        style={{ overflow: "visible" }}
         breakpoints={{
-          320: { slidesPerView: 1.5, spaceBetween: 8 },
-          640: { slidesPerView: 2.5, spaceBetween: 16 },
-          1024: { slidesPerView: 3.5, spaceBetween: 16 },
+          320: { slidesPerView: 1.5, spaceBetween: 8, slidesOffsetAfter: 16 },
+          640: { slidesPerView: 2.5, spaceBetween: 16, slidesOffsetAfter: 32 },
+          1024: { slidesPerView: 3.5, spaceBetween: 16, slidesOffsetAfter: 32 },
         }}
       >
         {movies.map((movie) => (
