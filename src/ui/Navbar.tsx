@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
+import { motion } from "framer-motion";
 import { useLogout } from "../hooks/useLogout";
 
 const NAV_ITEMS = [
@@ -81,18 +82,25 @@ function Navbar() {
             key={item.to}
             to={item.to}
             className={({ isActive }) =>
-              `flex items-center gap-3 ${
+              `flex items-center gap-3 lg:w-full ${
+                expanded ? "lg:justify-start lg:px-5" : "lg:justify-center"
+              } ${
                 isActive ? "text-white" : "text-grayishBlue"
               } transition-colors duration-200 hover:text-red focus:border-none focus:text-white focus:outline-none`
             }
             title={item.label}
           >
             <NavIcon icon={item.icon} />
-            <span className={`text-xs font-medium whitespace-nowrap ${
-              expanded ? "lg:inline" : "lg:hidden"
-            }`}>
+            <motion.span
+              className="text-xs font-medium whitespace-nowrap overflow-hidden"
+              animate={{
+                maxWidth: expanded ? 100 : 0,
+                opacity: expanded ? 1 : 0,
+              }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+            >
               {item.label}
-            </span>
+            </motion.span>
           </NavLink>
         ))}
       </div>
@@ -100,22 +108,36 @@ function Navbar() {
       <div className="hidden items-center gap-3 lg:mt-auto lg:flex lg:flex-col lg:pb-12">
         <NavLink
           to="/profile"
-          className="flex items-center justify-center text-grayishBlue transition-colors duration-200 hover:text-white focus:outline-none"
+          className={`flex items-center gap-3 lg:w-full ${
+            expanded ? "lg:justify-start lg:px-5" : "lg:justify-center"
+          } text-grayishBlue transition-colors duration-200 hover:text-white focus:outline-none`}
           title="Profile"
         >
-          <div className="h-[2.5rem] w-[2.5rem] overflow-hidden rounded-full border border-white">
+          <div className="h-[2.5rem] w-[2.5rem] shrink-0 overflow-hidden rounded-full border border-white">
             <img
               src="/assets/image-avatar.png"
               alt="Avatar icon"
               className="h-full w-full object-cover"
             />
           </div>
+          <motion.span
+            className="text-xs font-medium whitespace-nowrap overflow-hidden"
+            animate={{
+              maxWidth: expanded ? 80 : 0,
+              opacity: expanded ? 1 : 0,
+            }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+          >
+            Profile
+          </motion.span>
         </NavLink>
 
         <button
           onClick={() => logout()}
           disabled={isPending}
-          className="flex items-center justify-center text-grayishBlue transition-colors duration-200 hover:text-red focus:outline-none"
+          className={`flex items-center gap-3 lg:w-full ${
+            expanded ? "lg:justify-start lg:px-5" : "lg:justify-center"
+          } text-grayishBlue transition-colors duration-200 hover:text-red focus:outline-none`}
           title="Logout"
         >
           <svg
@@ -133,6 +155,16 @@ function Navbar() {
             <polyline points="16 17 21 12 16 7" />
             <line x1="21" y1="12" x2="9" y2="12" />
           </svg>
+          <motion.span
+            className="text-xs font-medium whitespace-nowrap overflow-hidden"
+            animate={{
+              maxWidth: expanded ? 80 : 0,
+              opacity: expanded ? 1 : 0,
+            }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+          >
+            Logout
+          </motion.span>
         </button>
       </div>
     </nav>
