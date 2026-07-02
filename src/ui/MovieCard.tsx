@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { useBookmark } from "../hooks/useBookmark";
 import type { MoviesProps } from "types";
 import Playicon from "./Playicon";
@@ -17,16 +18,37 @@ function MovieCard({ movie }: MoviesProps) {
       window.matchMedia("(hover: hover)").matches,
   ).current;
 
-  const [hovered, setHovered] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const hoverTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const route =
     category === "tv series" ? `/tv/${movie.id}` : `/movie/${movie.id}`;
 
+  const handleMouseEnter = () => {
+    if (!isHoverDevice) return;
+    clearTimeout(hoverTimer.current);
+    hoverTimer.current = setTimeout(() => setIsHovered(true), 200);
+  };
+
+  const handleMouseLeave = () => {
+    clearTimeout(hoverTimer.current);
+    setIsHovered(false);
+  };
+
   return (
-    <div
+    <motion.div
       className="relative mb-4"
-      onMouseEnter={() => isHoverDevice && setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      animate={{ scale: isHovered ? 1.1 : 1 }}
+      transition={{
+        scale: {
+          type: "spring",
+          stiffness: 300,
+          damping: 25,
+        },
+      }}
+      style={{ zIndex: isHovered ? 50 : 1 }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <div className="flex flex-col">
         <div
@@ -113,8 +135,21 @@ function MovieCard({ movie }: MoviesProps) {
         </div>
       </div>
 
-      {hovered && <QuickViewPopover movie={movie} />}
-    </div>
+      <AnimatePresence>
+        {isHovered && (
+          <motion.div
+            className="absolute left-0 right-0 z-50 pt-2"
+            style={{ top: "100%" }}
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <QuickViewPopover movie={movie} inline />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }
 
