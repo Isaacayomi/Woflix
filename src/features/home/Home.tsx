@@ -1,4 +1,5 @@
 import { useSearchParams, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { FreeMode } from "swiper/modules";
 import { useHomeMovies } from "../../hooks/useHomeMovies";
@@ -20,6 +21,7 @@ import { imageUrl } from "../../lib/tmdb";
 import MovieCardSkeleton from "../../ui/skeletons/MovieCardSkeleton";
 import TrendingSkeleton from "../../ui/skeletons/TrendingSkeleton";
 import HeroSkeleton from "../../ui/skeletons/HeroSkeleton";
+import StaggerContainer, { cardVariants } from "../../ui/StaggerContainer";
 
 const POPULAR_GENRES = [28, 12, 35, 18, 10749, 14, 27, 878];
 
@@ -103,11 +105,13 @@ function Home() {
           ) : topMovies.length > 0 ? (
             <div className="pb-6">
               <Heading>Top Rated</Heading>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <StaggerContainer className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {topMovies.slice(0, 6).map((m) => (
-                  <MovieCard movie={m} key={m.id} />
+                  <motion.div key={m.id} variants={cardVariants}>
+                    <MovieCard movie={m} />
+                  </motion.div>
                 ))}
-              </div>
+              </StaggerContainer>
             </div>
           ) : null}
 
@@ -119,10 +123,11 @@ function Home() {
                 spaceBetween={16}
                 freeMode
                 grabCursor
+                style={{ overflow: "visible" }}
                 breakpoints={{
-                  320: { slidesPerView: 1.5, spaceBetween: 8 },
-                  640: { slidesPerView: 2.5, spaceBetween: 16 },
-                  1024: { slidesPerView: 3.5, spaceBetween: 16 },
+                  320: { slidesPerView: 1.5, spaceBetween: 8, slidesOffsetAfter: 16 },
+                  640: { slidesPerView: 2.5, spaceBetween: 16, slidesOffsetAfter: 32 },
+                  1024: { slidesPerView: 3.5, spaceBetween: 16, slidesOffsetAfter: 32 },
                 }}
               >
                 {continueWatching.map((entry) => (
@@ -147,11 +152,13 @@ function Home() {
           ) : upcomingMovies.length > 0 ? (
             <div className="pb-6">
               <Heading>Coming Soon</Heading>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <StaggerContainer className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {upcomingMovies.slice(0, 6).map((m) => (
-                  <MovieCard movie={m} key={m.id} />
+                  <motion.div key={m.id} variants={cardVariants}>
+                    <MovieCard movie={m} />
+                  </motion.div>
                 ))}
-              </div>
+              </StaggerContainer>
             </div>
           ) : null}
 
@@ -159,28 +166,29 @@ function Home() {
           {recentlyViewed.length > 0 && (
             <div className="pb-6">
               <Heading>Recently Viewed</Heading>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <StaggerContainer className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {recentlyViewed.map((item) => (
-                  <MovieCard
-                    movie={{
-                      id: item.tmdbId,
-                      title: item.title,
-                      year: "",
-                      category: item.mediaType === "movie" ? "movie" : "tv series",
-                      rating: "N/A",
-                      thumbnail: {
-                        regular: {
-                          small: imageUrl(item.posterPath, "w185"),
-                          medium: imageUrl(item.posterPath, "w342"),
-                          large: imageUrl(item.posterPath, "w500"),
+                  <motion.div key={item.tmdbId} variants={cardVariants}>
+                    <MovieCard
+                      movie={{
+                        id: item.tmdbId,
+                        title: item.title,
+                        year: "",
+                        category: item.mediaType === "movie" ? "movie" : "tv series",
+                        rating: "N/A",
+                        thumbnail: {
+                          regular: {
+                            small: imageUrl(item.posterPath, "w185"),
+                            medium: imageUrl(item.posterPath, "w342"),
+                            large: imageUrl(item.posterPath, "w500"),
+                          },
                         },
-                      },
-                      isBookmarked: false,
-                    }}
-                    key={item.tmdbId}
-                  />
+                        isBookmarked: false,
+                      }}
+                    />
+                  </motion.div>
                 ))}
-              </div>
+              </StaggerContainer>
             </div>
           )}
 
@@ -188,11 +196,13 @@ function Home() {
           {hasBookmarks && !recPending && recommended.length > 0 && (
             <div className="pb-6">
               <Heading>Recommended For You</Heading>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <StaggerContainer className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {recommended.slice(0, 6).map((m) => (
-                  <MovieCard movie={m} key={m.id} />
+                  <motion.div key={m.id} variants={cardVariants}>
+                    <MovieCard movie={m} />
+                  </motion.div>
                 ))}
-              </div>
+              </StaggerContainer>
             </div>
           )}
 
@@ -210,14 +220,16 @@ function Home() {
             <p className="mb-4 text-sm text-grayishBlue">Updating results...</p>
           )}
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <StaggerContainer className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {allMovies?.length === 0 && !isPending && <p>No results found</p>}
             {allMovies
               ?.filter(Boolean)
               .map((movie) => (
-                <MovieCard movie={movie} key={movie.id} />
+                <motion.div key={movie.id} variants={cardVariants}>
+                  <MovieCard movie={movie} />
+                </motion.div>
               ))}
-          </div>
+          </StaggerContainer>
         </>
       )}
     </div>
