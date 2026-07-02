@@ -1,11 +1,12 @@
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { useMoviePreview } from "../hooks/useMoviePreview";
 import { useCertification } from "../hooks/useCertification";
 import { useBookmark } from "../hooks/useBookmark";
 import type { Movie } from "types";
 import SpinnerMini from "./SpinnerMini";
 
-function QuickViewPopover({ movie }: { movie: Movie }) {
+function QuickViewPopover({ movie, inline = false }: { movie: Movie; inline?: boolean }) {
   const navigate = useNavigate();
   const { data: detail, isPending } = useMoviePreview(movie.id, movie.category);
   const { certification } = useCertification(movie.id);
@@ -15,6 +16,104 @@ function QuickViewPopover({ movie }: { movie: Movie }) {
     movie.category === "tv series"
       ? `/tv/${movie.id}`
       : `/movie/${movie.id}`;
+
+  if (inline) {
+    const containerVariants = {
+      hidden: { opacity: 0 },
+      visible: {
+        opacity: 1,
+        transition: { staggerChildren: 0.08, delayChildren: 0.2 },
+      },
+    };
+
+    const itemVariants = {
+      hidden: { opacity: 0, y: -8 },
+      visible: { opacity: 1, y: 0, transition: { duration: 0.25 } },
+    };
+
+    return (
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="flex flex-col gap-2 rounded-lg bg-darkBlue p-3 shadow-2xl"
+        onClick={() => navigate(route)}
+      >
+        {/* Rating, year, certification, category */}
+        <motion.div variants={itemVariants} className="flex items-center gap-2 text-xs text-white/70">
+          <span className="rounded bg-yellow-500 px-1.5 py-0.5 font-bold text-black">
+            {movie.rating}
+          </span>
+          <span>{movie.year}</span>
+          {certification && (
+            <span className="rounded border border-white/20 px-1 py-0.5 text-[10px] font-semibold uppercase">
+              {certification}
+            </span>
+          )}
+          <span className="capitalize">{movie.category}</span>
+        </motion.div>
+
+        {/* Genres */}
+        <motion.div variants={itemVariants}>
+          {isPending ? (
+            <div className="flex gap-1.5">
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="h-5 w-16 animate-pulse rounded-full bg-semiDarkBlue"
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-wrap gap-1.5">
+              {(detail?.genres ?? []).slice(0, 3).map((g) => (
+                <span
+                  key={g.id}
+                  className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-white/70"
+                >
+                  {g.name}
+                </span>
+              ))}
+            </div>
+          )}
+        </motion.div>
+
+        {/* Overview */}
+        <motion.p variants={itemVariants} className="text-[11px] leading-relaxed text-white/60 line-clamp-2">
+          {isPending ? (
+            <>
+              <span className="inline-block h-3 w-full animate-pulse rounded bg-semiDarkBlue" />
+              <span className="mt-1 inline-block h-3 w-3/4 animate-pulse rounded bg-semiDarkBlue" />
+            </>
+          ) : (
+            detail?.overview ?? "No overview available."
+          )}
+        </motion.p>
+
+        {/* Watch button */}
+        <motion.div variants={itemVariants}>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(route);
+            }}
+            className="flex w-full items-center justify-center gap-1.5 rounded-md bg-red py-1.5 text-xs font-medium hover:bg-red/80"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <path d="M8 5v14l11-7z" />
+            </svg>
+            Watch Now
+          </button>
+        </motion.div>
+      </motion.div>
+    );
+  }
 
   return (
     <div
