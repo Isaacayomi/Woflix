@@ -17,8 +17,7 @@ export default function StaggerContainer({
   return (
     <motion.div
       initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, amount: 0.05 }}
+      animate="visible"
       variants={{
         visible: { transition: { staggerChildren: staggerMs } },
       }}
