@@ -1,8 +1,8 @@
-# WòFlix — Entertainment Web App
+# Woflix
 
 ## Overview
 
-WòFlix is a high-performance media-discovery platform built with **React 19**, **TypeScript**, and **Tailwind CSS**. It provides a Netflix-like experience for browsing movies and TV series, featuring user authentication, personalized bookmarking, watch history, and rich content discovery powered by **The Movie Database (TMDB) API**.
+Woflix is a high-performance streaming platform built with **React 19**, **TypeScript**, and **Tailwind CSS**. It provides a Netflix-like experience for browsing movies and TV series, with Firebase authentication, personalized bookmarks, watch history, search, and rich content discovery powered by **The Movie Database (TMDB) API**. The entire UI is available in **12 languages**, with the chosen language synced across your profile, API requests, and local storage.
 
 ## Features
 
@@ -19,6 +19,7 @@ WòFlix is a high-performance media-discovery platform built with **React 19**, 
 - **Continue Watching** — Automatically tracks in-progress items with a visual progress bar
 - **Watch History** — Full browsing history with the ability to revisit any item
 - **Dark Mode** — Toggle between dark and light themes from the Profile page
+- **Multi-Language Support** — The entire UI translates across **12 languages** (English, French, Spanish, German, Japanese, Korean, Hindi, Chinese, Italian, Portuguese, Russian, Arabic). Switch from the Profile page — preference syncs to your account and local storage. TMDB API results also follow your chosen language.
 
 ### Search
 - **Global Search** — Context-aware search that prioritizes results based on the current view
@@ -44,14 +45,14 @@ WòFlix is a high-performance media-discovery platform built with **React 19**, 
 ### Installation
 
 ```bash
-git clone https://github.com/Isaacayomi/Entertainment-web-app.git
-cd Entertainment-web-app
+git clone https://github.com/Isaacayomi/Woflix.git
+cd Woflix
 npm install
 ```
 
 ### Environment Variables
 
-Create a `.env` file in the root directory with your Firebase and TMDB credentials:
+Create a `.env` file in the root directory with your Firebase and TMDB credentials for the streaming app:
 
 ```env
 VITE_FIREBASE_API_KEY=your_firebase_api_key
@@ -85,6 +86,7 @@ npm run build
 6. **Watch** — Click any card to view the detail page with trailer, cast, and similar recommendations
 7. **Track** — Your watch progress is automatically saved under Continue Watching
 8. **History** — Access your full watch history from the sidebar
+9. **Change Language** — Go to Profile → Language and pick any of the 12 supported languages. The entire interface, search placeholder, and content metadata refresh immediately.
 
 ## Technologies Used
 
@@ -100,6 +102,7 @@ npm run build
 | **Swiper 12** | Carousel Components |
 | **React Hook Form 7** | Form Handling |
 | **React Hot Toast** | Notifications |
+| **i18next** | Internationalization (12 languages) |
 | **TMDB API** | Content Data |
 
 ## Author

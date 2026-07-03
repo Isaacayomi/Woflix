@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import Home from "./features/home/Home";
 import Movies from "./features/movies/Movies";
 import Series from "./features/series/Series";
@@ -11,7 +11,7 @@ import PlatformResults from "./features/platforms/PlatformResults";
 import CollectionPage from "./features/collection/CollectionPage";
 import DetailPage from "./features/detail/DetailPage";
 import AppLayout from "./ui/AppLayout";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import PageNotFound from "./ui/PageNotFound";
 import Login from "./features/authentication/Login";
@@ -20,6 +20,42 @@ import Profile from "./features/profile/Profile";
 import History from "./features/history/History";
 import { Toaster } from "react-hot-toast";
 import { useEffect } from "react";
+import { getRedirectResult, browserPopupRedirectResolver } from "firebase/auth";
+import { auth } from "./lib/firebase";
+import toast from "react-hot-toast";
+import i18n from "./lib/i18n/config";
+
+function RedirectHandler() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    getRedirectResult(auth, browserPopupRedirectResolver).then((result) => {
+      if (result?.user) {
+        navigate("/", { replace: true });
+        toast.success("Logged in successfully");
+      }
+    }).catch(() => {
+      toast.error("Google sign-in failed");
+    });
+  }, [navigate]);
+
+  return null;
+}
+
+function LanguageChangeHandler() {
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const handle = (lng: string) => {
+      localStorage.setItem("language", lng);
+      queryClient.invalidateQueries();
+    };
+    i18n.on("languageChanged", handle);
+    return () => i18n.off("languageChanged", handle);
+  }, [queryClient]);
+
+  return null;
+}
 
 function App() {
   const queryClient = new QueryClient({
@@ -45,6 +81,8 @@ function App() {
 
       <BrowserRouter>
         <Toaster position="top-center" reverseOrder={false} />
+        <RedirectHandler />
+        <LanguageChangeHandler />
         <Routes>
           <Route element={<AppLayout />}>
             <Route element={<Home />} path="/" />
