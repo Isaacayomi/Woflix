@@ -1,15 +1,32 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useSignUp } from "../../hooks/useSignUp";
+import { useGoogleLogin } from "../../hooks/useGoogleLogin";
+import { useUser } from "../../hooks/useUser";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { AuthProps } from "types";
 
+import AuthLayout from "./AuthLayout";
 import AuthPrompt from "../../ui/AuthPrompt";
 import Button from "../../ui/Button";
 import ErrorMessage from "../../ui/ErrorMessage";
 import SpinnerMini from "../../ui/SpinnerMini";
+import GoogleButton from "../../ui/GoogleButton";
 
 function SignUp() {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { isAuthenticated, isPending: authPending } = useUser();
+
+  useEffect(() => {
+    if (!authPending && isAuthenticated) {
+      navigate("/", { replace: true });
+    }
+  }, [isAuthenticated, authPending, navigate]);
+
   const { mutate, isPending } = useSignUp();
+  const { googleLogin, isPending: googlePending } = useGoogleLogin();
 
   const { handleSubmit, register, formState, getValues, reset } =
     useForm<AuthProps>();
@@ -33,48 +50,47 @@ function SignUp() {
   }
 
   return (
-    <div className="flex h-screen flex-col items-center justify-center gap-4 bg-darkBlue font-outfit">
-      <img src="/favicon-32x32.svg" alt="App Logo" className="mb-8" />
+    <AuthLayout>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="flex w-full max-w-[20.4375rem] flex-col rounded-[0.625rem] bg-semiDarkBlue p-4 pl-6 md:max-w-[25rem]"
+        className="flex w-full flex-col"
       >
         <h2 className="tracking-[ -0.03125rem] pb-10 font-outfit text-[2rem] font-normal text-white">
-          Sign Up
+          {t("auth.signUp")}
         </h2>
-        <div className="mb-6 flex w-full max-w-[17.4375rem] items-start justify-between border-b border-b-grayishBlue focus-within:border-b-white md:max-w-[21rem] md:text-nowrap">
+
+        <div className="mb-6 flex w-full items-start justify-between border-b border-b-grayishBlue focus-within:border-b-white">
           <input
             id="email"
             type="email"
-            placeholder="Email address"
+            placeholder={t("auth.emailPlaceholder")}
             className="w-full bg-transparent pb-[1.13rem] text-white focus:outline-none"
             aria-invalid={errors.email ? "true" : "false"}
             {...register("email", {
-              required: "This field cannot be empty",
+              required: t("auth.fieldRequired"),
               setValueAs: (value) => value.trim(),
-
               pattern: {
                 value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                message: "Invalid email address",
+                message: t("auth.invalidEmail"),
               },
             })}
           />
           {errors.email && <ErrorMessage>{errors.email.message}</ErrorMessage>}
         </div>
 
-        <div className="mb-6 flex w-full max-w-[17.4375rem] items-start justify-between border-b border-b-grayishBlue focus-within:border-b-white md:max-w-[21rem] md:text-nowrap">
+        <div className="mb-6 flex w-full items-start justify-between border-b border-b-grayishBlue focus-within:border-b-white">
           <input
             id="password"
             type="password"
-            placeholder="Password"
+            placeholder={t("auth.passwordPlaceholder")}
             className="w-full bg-transparent pb-[1.13rem] text-white focus:outline-none"
             aria-invalid={errors.password ? "true" : "false"}
             {...register("password", {
-              required: "This field cannot be empty",
+              required: t("auth.fieldRequired"),
               setValueAs: (value) => value.trim(),
               minLength: {
                 value: 8,
-                message: "Password must be at least 8 characters",
+                message: t("auth.passwordLength"),
               },
             })}
           />
@@ -83,31 +99,50 @@ function SignUp() {
           )}
         </div>
 
-        <div className="mb-6 flex w-full max-w-[17.4375rem] items-start justify-between border-b border-b-grayishBlue focus-within:border-b-white md:max-w-[21rem] md:text-nowrap">
+        <div className="mb-6 flex w-full items-start justify-between border-b border-b-grayishBlue focus-within:border-b-white">
           <input
             id="passwordConfirm"
             type="password"
-            placeholder="Repeat password"
+            placeholder={t("auth.repeatPasswordPlaceholder")}
             className="w-full bg-transparent pb-[1.13rem] text-white focus:outline-none"
             {...register("confirmPassword", {
-              required: "This field cannot be empty",
+              required: t("auth.fieldRequired"),
               validate: (value) =>
-                value === getValues("password") || "Passwords do not match",
+                value === getValues("password") || t("auth.passwordsMismatch"),
             })}
           />
           {errors.confirmPassword && (
             <ErrorMessage>{errors.confirmPassword.message}</ErrorMessage>
           )}
         </div>
-        <Button>{isPending ? <SpinnerMini /> : "Create your account"}</Button>
+
+        <Button>{isPending ? <SpinnerMini /> : t("auth.createAccount")}</Button>
+
+        <div className="relative mb-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-white/10" />
+          </div>
+          <div className="relative flex justify-center text-xs">
+            <span className="bg-darkBlue px-2 text-white/40">{t("auth.or")}</span>
+          </div>
+        </div>
+
+        <div className="mb-4">
+          <GoogleButton
+            onClick={() => googleLogin()}
+            isPending={googlePending}
+            label={t("auth.continueWithGoogle")}
+          />
+        </div>
+
         <AuthPrompt>
-          Already have an account?{" "}
+          {t("auth.alreadyHaveAccount")}{" "}
           <Link to="/login">
-            <span className="cursor-pointer text-red">Login</span>
+            <span className="cursor-pointer text-red">{t("auth.loginLink")}</span>
           </Link>
         </AuthPrompt>
       </form>
-    </div>
+    </AuthLayout>
   );
 }
 export default SignUp;

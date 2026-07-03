@@ -2,14 +2,16 @@ import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useLogout } from "../hooks/useLogout";
+import { useTranslation } from "react-i18next";
+import { auth } from "../lib/firebase";
 
 const NAV_ITEMS = [
-  { to: "/", label: "Home", icon: "home" },
-  { to: "/movies", label: "Movies", icon: "movies" },
-  { to: "/series", label: "TV Series", icon: "series" },
-  { to: "/categories", label: "Browse", icon: "categories" },
-  { to: "/bookmarks", label: "Bookmarks", icon: "bookmarks" },
-  { to: "/history", label: "History", icon: "history" },
+  { to: "/", key: "home", icon: "home" },
+  { to: "/movies", key: "movies", icon: "movies" },
+  { to: "/series", key: "series", icon: "series" },
+  { to: "/categories", key: "browse", icon: "categories" },
+  { to: "/bookmarks", key: "bookmarks", icon: "bookmarks" },
+  { to: "/history", key: "history", icon: "history" },
 ] as const;
 
 function NavIcon({ icon }: { icon: string }) {
@@ -60,19 +62,20 @@ function NavIcon({ icon }: { icon: string }) {
 }
 
 function Navbar() {
+  const { t } = useTranslation();
   const { logout, isPending } = useLogout();
   const [expanded, setExpanded] = useState(false);
 
   return (
     <nav
-      onMouseEnter={() => setExpanded(true)}
-      onMouseLeave={() => setExpanded(false)}
+      onMouseEnter={() => window.innerWidth >= 1024 && setExpanded(true)}
+      onMouseLeave={() => window.innerWidth >= 1024 && setExpanded(false)}
       className={`fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around bg-semiDarkBlue px-4 py-3 transition-all duration-300 lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:flex-shrink-0 lg:flex-col lg:justify-between lg:rounded-[1.25rem] lg:py-8 ${
         expanded ? "lg:w-[9rem] lg:px-5" : "lg:w-[6rem]"
       }`}>
       <img
         src="/assets/icon-nav-movies.svg"
-        alt="movies nav icon"
+        alt={t("nav.navIconAlt")}
         className="hidden lg:block lg:pb-12"
       />
 
@@ -88,7 +91,7 @@ function Navbar() {
                 isActive ? "text-white" : "text-grayishBlue"
               } transition-colors duration-200 hover:text-red focus:border-none focus:text-white focus:outline-none`
             }
-            title={item.label}
+            title={t(`nav.${item.key}`)}
           >
             <NavIcon icon={item.icon} />
             <motion.span
@@ -99,7 +102,7 @@ function Navbar() {
               }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
             >
-              {item.label}
+              {t(`nav.${item.key}`)}
             </motion.span>
           </NavLink>
         ))}
@@ -111,12 +114,12 @@ function Navbar() {
           className={`flex items-center gap-3 lg:w-full ${
             expanded ? "lg:justify-start lg:px-5" : "lg:justify-center"
           } text-grayishBlue transition-colors duration-200 hover:text-white focus:outline-none`}
-          title="Profile"
+          title={t("nav.profile")}
         >
           <div className="h-[2.5rem] w-[2.5rem] shrink-0 overflow-hidden rounded-full border border-white">
             <img
-              src="/assets/image-avatar.png"
-              alt="Avatar icon"
+              src={auth.currentUser?.photoURL || "/assets/image-avatar.png"}
+              alt={t("nav.avatarAlt")}
               className="h-full w-full object-cover"
             />
           </div>
@@ -128,7 +131,7 @@ function Navbar() {
             }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
           >
-            Profile
+            {t("nav.profile")}
           </motion.span>
         </NavLink>
 
@@ -138,7 +141,7 @@ function Navbar() {
           className={`flex items-center gap-3 lg:w-full ${
             expanded ? "lg:justify-start lg:px-5" : "lg:justify-center"
           } text-grayishBlue transition-colors duration-200 hover:text-red focus:outline-none`}
-          title="Logout"
+          title={t("nav.logout")}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -163,7 +166,7 @@ function Navbar() {
             }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
           >
-            Logout
+            {t("nav.logout")}
           </motion.span>
         </button>
       </div>

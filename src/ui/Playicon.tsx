@@ -1,6 +1,8 @@
+import { useTranslation } from "react-i18next";
 import { PlayIconProps } from "types";
 
 function Playicon({ className, onClick }: PlayIconProps) {
+  const { t } = useTranslation();
   return (
     <button
       onClick={onClick}
@@ -22,7 +24,7 @@ function Playicon({ className, onClick }: PlayIconProps) {
           />
         </svg>
       </span>
-      <span className="font-outfit text-[1.125rem] font-normal">Play</span>
+      <span className="font-outfit text-[1.125rem] font-normal">{t("playIcon.play")}</span>
     </button>
   );
 }
