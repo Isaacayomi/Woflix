@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { useMovies } from "../../hooks/useMovies";
 import { useGenres } from "../../hooks/useGenres";
 import Heading from "../../ui/Heading";
@@ -10,6 +11,7 @@ import MovieCardSkeleton from "../../ui/skeletons/MovieCardSkeleton";
 import StaggerContainer, { cardVariants } from "../../ui/StaggerContainer";
 
 function Movies() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const query = searchParams.get("q") || "";
   const [genreFilter, setGenreFilter] = useState<number | null>(null);
@@ -56,11 +58,11 @@ function Movies() {
       )}
 
       {!query && (
-        <Heading>Movies</Heading>
+        <Heading>{t("movies.heading")}</Heading>
       )}
 
       <Heading>
-        {query ? `Found ${movies.length} results for "${query}"` : ""}
+        {query ? t("movies.searchResults", { count: movies.length, query }) : ""}
       </Heading>
 
       {!query && movieGenres.length > 0 && (
@@ -73,7 +75,7 @@ function Movies() {
                 : "bg-semiDarkBlue text-white hover:bg-white/20"
             }`}
           >
-            All
+            {t("movies.filterAll")}
           </button>
           {movieGenres.map((g) => (
             <button
@@ -99,7 +101,7 @@ function Movies() {
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.2 }}
         >
-          {!isPending && movies.length === 0 && <p>No results found</p>}
+          {!isPending && movies.length === 0 && <p>{t("movies.noResults")}</p>}
 
           <StaggerContainer className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {movies.map((movie) => (

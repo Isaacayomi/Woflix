@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { getCollection } from "../../services/apiCollections";
 import { imageUrl } from "../../lib/tmdb";
 import type { Movie, TMDBMovieResult } from "types";
@@ -30,6 +31,7 @@ function mapToMovie(item: TMDBMovieResult): Movie {
 }
 
 function CollectionPage() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const name = searchParams.get("name") || "Collection";
@@ -45,7 +47,7 @@ function CollectionPage() {
   if (!collection)
     return (
       <div className="flex h-screen items-center justify-center text-white">
-        Collection not found
+        {t("collection.notFound")}
       </div>
     );
 
@@ -71,7 +73,7 @@ function CollectionPage() {
             </p>
           )}
           <p className="mt-1 text-xs text-white/40">
-            {collection.parts.length} titles
+            {t("collection.resultCount", { count: collection.parts.length })}
           </p>
         </div>
       </div>

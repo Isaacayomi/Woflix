@@ -1,10 +1,12 @@
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useWatchProviders } from "../../hooks/useWatchProviders";
 import { imageUrl } from "../../lib/tmdb";
 import Heading from "../../ui/Heading";
 import Spinner from "../../ui/Spinner";
 
 function PlatformsPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { providers, isPending } = useWatchProviders();
 
@@ -12,9 +14,9 @@ function PlatformsPage() {
 
   return (
     <div className="px-6 pb-12 pt-6 md:px-12">
-      <Heading>Streaming Platforms</Heading>
+      <Heading>{t("platform.heading")}</Heading>
       <p className="mb-6 text-sm text-white/60">
-        Browse movies available on your favorite streaming services
+        {t("platform.desc")}
       </p>
 
       <div className="grid grid-cols-3 gap-4 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">

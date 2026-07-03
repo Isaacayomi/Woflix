@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { useSeries } from "../../hooks/useSeries";
 import { useGenres } from "../../hooks/useGenres";
 import MovieCard from "../../ui/MovieCard";
@@ -10,6 +11,7 @@ import MovieCardSkeleton from "../../ui/skeletons/MovieCardSkeleton";
 import StaggerContainer, { cardVariants } from "../../ui/StaggerContainer";
 
 function Series() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const query = searchParams.get("q") || "";
   const [genreFilter, setGenreFilter] = useState<number | null>(null);
@@ -56,11 +58,11 @@ function Series() {
       )}
 
       {!query && (
-        <Heading>TV Series</Heading>
+        <Heading>{t("series.heading")}</Heading>
       )}
 
       <Heading>
-        {query ? `Found ${series.length} results for "${query}"` : ""}
+        {query ? t("series.searchResults", { count: series.length, query }) : ""}
       </Heading>
 
       {!query && tvGenres.length > 0 && (
@@ -73,7 +75,7 @@ function Series() {
                 : "bg-semiDarkBlue text-white hover:bg-white/20"
             }`}
           >
-            All
+            {t("series.filterAll")}
           </button>
           {tvGenres.map((g) => (
             <button
@@ -99,7 +101,7 @@ function Series() {
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.2 }}
         >
-          {!isPending && series.length === 0 && <p>No results found</p>}
+          {!isPending && series.length === 0 && <p>{t("series.noResults")}</p>}
 
           <StaggerContainer className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {series.map((serie) => (

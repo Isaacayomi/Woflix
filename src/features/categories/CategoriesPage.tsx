@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useWatchProviders } from "../../hooks/useWatchProviders";
 import { imageUrl } from "../../lib/tmdb";
 import Heading from "../../ui/Heading";
@@ -20,26 +21,26 @@ const LANGUAGES = [
 ];
 
 const MOODS = [
-  { genreId: 28, name: "Action Packed" },
-  { genreId: 35, name: "Feel Good" },
-  { genreId: 27, name: "Scary" },
-  { genreId: 10749, name: "Romantic" },
-  { genreId: 878, name: "Sci-Fi" },
-  { genreId: 53, name: "Thrilling" },
-  { genreId: 18, name: "Heartfelt" },
-  { genreId: 12, name: "Epic" },
-  { genreId: 9648, name: "Mysterious" },
-  { genreId: 16, name: "Animated" },
-  { genreId: 14, name: "Fantasy" },
-  { genreId: 36, name: "Historical" },
+  { genreId: 28, tKey: "action" },
+  { genreId: 35, tKey: "feelGood" },
+  { genreId: 27, tKey: "scary" },
+  { genreId: 10749, tKey: "romantic" },
+  { genreId: 878, tKey: "sciFi" },
+  { genreId: 53, tKey: "thrilling" },
+  { genreId: 18, tKey: "heartfelt" },
+  { genreId: 12, tKey: "epic" },
+  { genreId: 9648, tKey: "mysterious" },
+  { genreId: 16, tKey: "animated" },
+  { genreId: 14, tKey: "fantasy" },
+  { genreId: 36, tKey: "historical" },
 ];
 
 const DECADES = [
-  { year: "1980", label: "80s" },
-  { year: "1990", label: "90s" },
-  { year: "2000", label: "2000s" },
-  { year: "2010", label: "2010s" },
-  { year: "2020", label: "2020s" },
+  { year: "1980", tKey: "80s" },
+  { year: "1990", tKey: "90s" },
+  { year: "2000", tKey: "2000s" },
+  { year: "2010", tKey: "2010s" },
+  { year: "2020", tKey: "2020s" },
 ];
 
 const GRADIENTS = [
@@ -58,28 +59,29 @@ const GRADIENTS = [
 ];
 
 function CategoriesPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { providers, isPending: provPending } = useWatchProviders();
 
   return (
     <div className="px-6 pb-12 pt-6 md:px-12">
-      <Heading>Browse</Heading>
+      <Heading>{t("categories.heading")}</Heading>
 
       {/* Moods */}
       <section className="mb-10">
-        <h2 className="mb-3 text-lg font-semibold">Moods</h2>
+        <h2 className="mb-3 text-lg font-semibold">{t("categories.moods")}</h2>
         <div className="flex gap-4 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {MOODS.map((mood, i) => (
             <button
               key={mood.genreId}
               onClick={() =>
                 navigate(
-                  `/categories/${mood.genreId}?name=${encodeURIComponent(mood.name)}`,
+                  `/categories/${mood.genreId}?name=${encodeURIComponent(t(`categories.moodNames.${mood.tKey}`))}`,
                 )
               }
               className={`flex aspect-[16/10] w-40 shrink-0 items-end justify-start rounded-xl bg-gradient-to-br ${GRADIENTS[i % GRADIENTS.length]} p-4 text-left text-base font-bold text-white shadow-lg transition-transform hover:scale-105 hover:shadow-xl`}
             >
-              <span className="drop-shadow-lg">{mood.name}</span>
+              <span className="drop-shadow-lg">{t(`categories.moodNames.${mood.tKey}`)}</span>
             </button>
           ))}
         </div>
@@ -87,19 +89,19 @@ function CategoriesPage() {
 
       {/* Decades */}
       <section className="mb-10">
-        <h2 className="mb-3 text-lg font-semibold">Decades</h2>
+        <h2 className="mb-3 text-lg font-semibold">{t("categories.decades")}</h2>
         <div className="flex gap-4 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {DECADES.map((decade) => (
+          {DECADES.map((decade, i) => (
             <button
               key={decade.year}
               onClick={() =>
                 navigate(
-                  `/browse/decade/${decade.year}?name=${encodeURIComponent(decade.label)}`,
+                  `/browse/decade/${decade.year}?name=${encodeURIComponent(t(`categories.decadeLabels.${decade.tKey}`))}`,
                 )
               }
-              className="flex aspect-[16/10] w-40 shrink-0 items-end justify-start rounded-xl bg-gradient-to-br from-gray-700 to-gray-900 p-4 text-left text-base font-bold text-white shadow-lg transition-transform hover:scale-105 hover:shadow-xl"
+              className={`flex aspect-[16/10] w-40 shrink-0 items-end justify-start rounded-xl bg-gradient-to-br ${GRADIENTS[i % GRADIENTS.length]} p-4 text-left text-base font-bold text-white shadow-lg transition-transform hover:scale-105 hover:shadow-xl`}
             >
-              <span className="drop-shadow-lg">{decade.label}</span>
+              <span className="drop-shadow-lg">{t(`categories.decadeLabels.${decade.tKey}`)}</span>
             </button>
           ))}
         </div>
@@ -107,19 +109,19 @@ function CategoriesPage() {
 
       {/* Languages */}
       <section className="mb-10">
-        <h2 className="mb-3 text-lg font-semibold">Languages</h2>
+        <h2 className="mb-3 text-lg font-semibold">{t("categories.languages")}</h2>
         <div className="flex gap-4 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {LANGUAGES.map((lang) => (
+          {LANGUAGES.map((lang, i) => (
             <button
               key={lang.code}
               onClick={() =>
                 navigate(
-                  `/browse/language/${lang.code}?name=${encodeURIComponent(lang.name)}`,
+                  `/browse/language/${lang.code}?name=${encodeURIComponent(t(`categories.languageNames.${lang.code}`))}`,
                 )
               }
-              className="flex aspect-[16/10] w-36 shrink-0 items-end justify-start rounded-xl bg-gradient-to-br from-slate-600 to-slate-800 p-4 text-left text-base font-bold text-white shadow-lg transition-transform hover:scale-105 hover:shadow-xl"
+              className={`flex aspect-[16/10] w-36 shrink-0 items-end justify-start rounded-xl bg-gradient-to-br ${GRADIENTS[(i + 4) % GRADIENTS.length]} p-4 text-left text-base font-bold text-white shadow-lg transition-transform hover:scale-105 hover:shadow-xl`}
             >
-              <span className="drop-shadow-lg">{lang.name}</span>
+              <span className="drop-shadow-lg">{t(`categories.languageNames.${lang.code}`)}</span>
             </button>
           ))}
         </div>
@@ -127,12 +129,12 @@ function CategoriesPage() {
 
       {/* Platforms */}
       <section>
-        <h2 className="mb-3 text-lg font-semibold">Platforms</h2>
+        <h2 className="mb-3 text-lg font-semibold">{t("categories.platforms")}</h2>
         {provPending ? (
           <Spinner />
         ) : (
           <div className="flex gap-4 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {providers.slice(0, 36).map((provider) => (
+            {providers.slice(0, 36).map((provider, i) => (
               <button
                 key={provider.provider_id}
                 onClick={() =>
@@ -140,7 +142,7 @@ function CategoriesPage() {
                     `/platform/${provider.provider_id}?name=${encodeURIComponent(provider.provider_name)}`,
                   )
                 }
-                className="flex w-24 shrink-0 flex-col items-center gap-2 rounded-xl bg-semiDarkBlue p-4 transition-transform hover:scale-105 hover:bg-white/10"
+                className={`flex w-24 shrink-0 flex-col items-center gap-2 rounded-xl p-4 transition-transform hover:scale-105 hover:shadow-xl bg-gradient-to-br ${GRADIENTS[i % GRADIENTS.length]}`}
               >
                 <div className="h-10 w-10 overflow-hidden rounded-lg sm:h-12 sm:w-12">
                   <img

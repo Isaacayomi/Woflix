@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { useDiscoverMovies } from "../../hooks/useDiscoverMovies";
 import Heading from "../../ui/Heading";
 import MovieCard from "../../ui/MovieCard";
@@ -9,6 +10,7 @@ import MovieCardSkeleton from "../../ui/skeletons/MovieCardSkeleton";
 import StaggerContainer, { cardVariants } from "../../ui/StaggerContainer";
 
 function LanguageResults() {
+  const { t } = useTranslation();
   const { code } = useParams<{ code: string }>();
   const [searchParams] = useSearchParams();
   const name = searchParams.get("name") || code || "Language";
@@ -46,7 +48,7 @@ function LanguageResults() {
   return (
     <div className="px-6 pb-12 pt-6 md:px-12">
       <Heading>{name}</Heading>
-      <p className="mb-6 text-sm text-white/60">{movies.length} titles</p>
+      <p className="mb-6 text-sm text-white/60">{t("results.resultCount", { count: movies.length })}</p>
 
       {isPending && !movies.length && (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -56,7 +58,7 @@ function LanguageResults() {
         </div>
       )}
 
-      {!isPending && movies.length === 0 && <p>No results found</p>}
+      {!isPending && movies.length === 0 && <p>{t("results.noResults")}</p>}
 
       <StaggerContainer className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {movies.map((movie) => (
