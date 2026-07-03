@@ -1,14 +1,18 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { useBookmark } from "../hooks/useBookmark";
+import { usePrefetchDetail } from "../hooks/usePrefetchDetail";
 import type { MoviesProps } from "types";
 import Playicon from "./Playicon";
 import SpinnerMini from "./SpinnerMini";
 import QuickViewPopover from "./QuickViewPopover";
 
 function MovieCard({ movie }: MoviesProps) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
+  const { prefetchVideos } = usePrefetchDetail();
   const { bookmarked, isPending, handleClick } = useBookmark(movie);
   const { title, year, category, rating, thumbnail } = movie;
   const { regular } = thumbnail;
@@ -21,8 +25,14 @@ function MovieCard({ movie }: MoviesProps) {
   const [isHovered, setIsHovered] = useState(false);
   const hoverTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
+  const mediaType = category === "tv series" ? "tv" : "movie";
   const route =
-    category === "tv series" ? `/tv/${movie.id}` : `/movie/${movie.id}`;
+    mediaType === "tv" ? `/tv/${movie.id}` : `/movie/${movie.id}`;
+
+  const goToDetail = () => {
+    prefetchVideos(movie.id, mediaType);
+    navigate(route);
+  };
 
   const handleMouseEnter = () => {
     if (!isHoverDevice) return;
@@ -37,7 +47,7 @@ function MovieCard({ movie }: MoviesProps) {
 
   return (
     <motion.div
-      className="relative mb-4"
+      className="relative mb-4 origin-left"
       animate={{ scale: isHovered ? 1.1 : 1 }}
       transition={{
         scale: {
@@ -52,9 +62,9 @@ function MovieCard({ movie }: MoviesProps) {
     >
       <div className="flex flex-col">
         <div
-          onClick={() => navigate(route)}
+          onClick={goToDetail}
           style={{
-            backgroundImage: regular.large && `url(${regular.large})`,
+            backgroundImage: regular.large && `url(${isHovered ? regular.medium : regular.large})`,
             backgroundSize: "cover",
             backgroundRepeat: "no-repeat",
           }}
@@ -66,7 +76,7 @@ function MovieCard({ movie }: MoviesProps) {
             <Playicon
               onClick={(e) => {
                 e.stopPropagation();
-                navigate(route);
+                goToDetail();
               }}
               className="transition duration-300 md:flex md:group-hover:flex"
             />
@@ -90,7 +100,7 @@ function MovieCard({ movie }: MoviesProps) {
                     ? "/assets/icon-bookmark-full.svg"
                     : "/assets/icon-bookmark-empty.svg"
                 }
-                alt="Bookmark icon"
+                alt={t("movieCard.bookmarkAlt")}
                 className="m-auto flex items-center justify-center py-[0.56rem]"
               />
             )}
@@ -116,7 +126,7 @@ function MovieCard({ movie }: MoviesProps) {
                       ? "/assets/icon-category-movies.svg"
                       : "/assets/icon-category-tv.svg"
                   }
-                  alt={`${category} movie`}
+                  alt={t("movieCard.categoryAlt", { category })}
                 />
               </span>
               <span>{category}</span>

@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import type { Movie } from "types";
 import { useBookmark } from "../../hooks/useBookmark";
+import { usePrefetchDetail } from "../../hooks/usePrefetchDetail";
 import SpinnerMini from "../../ui/SpinnerMini";
 import Playicon from "../../ui/Playicon";
 
@@ -10,14 +12,22 @@ type TrendingMovieCardProps = {
 };
 
 function TrendingMovieCard({ movie, index }: TrendingMovieCardProps) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
+  const { prefetchVideos } = usePrefetchDetail();
   const { bookmarked, handleClick, isPending } = useBookmark(movie);
 
-  const route = movie.category === "tv series" ? `/tv/${movie.id}` : `/movie/${movie.id}`;
+  const mediaType = movie.category === "tv series" ? "tv" : "movie";
+  const route = mediaType === "tv" ? `/tv/${movie.id}` : `/movie/${movie.id}`;
+
+  const goToDetail = () => {
+    prefetchVideos(movie.id, mediaType);
+    navigate(route);
+  };
 
   return (
     <div
-      onClick={() => navigate(route)}
+      onClick={goToDetail}
       className="group relative z-10 flex aspect-[16/9] w-full flex-col rounded-lg bg-cover bg-no-repeat md:cursor-pointer"
       style={{
         backgroundImage: `url(${movie.thumbnail.trending?.large})`,
@@ -31,7 +41,7 @@ function TrendingMovieCard({ movie, index }: TrendingMovieCardProps) {
         <Playicon
           onClick={(e) => {
             e.stopPropagation();
-            navigate(route);
+            goToDetail();
           }}
           className="transition duration-300 group-hover:flex"
         />
@@ -59,7 +69,7 @@ function TrendingMovieCard({ movie, index }: TrendingMovieCardProps) {
                   ? "/assets/icon-bookmark-full.svg"
                   : "/assets/icon-bookmark-empty.svg"
               }
-            alt="Bookmark icon"
+            alt={t("trendingCard.bookmarkAlt")}
             className="m-auto flex items-center justify-center py-[0.56rem]"
           />
         )}

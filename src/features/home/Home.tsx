@@ -2,6 +2,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { FreeMode } from "swiper/modules";
+import { useTranslation } from "react-i18next";
 import { useHomeMovies } from "../../hooks/useHomeMovies";
 import { useHeroMovies } from "../../hooks/useHeroMovies";
 import { useTopRated } from "../../hooks/useTopRated";
@@ -26,6 +27,7 @@ import StaggerContainer, { cardVariants } from "../../ui/StaggerContainer";
 const POPULAR_GENRES = [28, 12, 35, 18, 10749, 14, 27, 878];
 
 function Home() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const query = searchParams.get("q") || "";
@@ -75,49 +77,27 @@ function Home() {
               >
                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
               </svg>
-              Feeling Lucky
+              {t("home.feelingLucky")}
             </button>
           </div>
 
           {isPending ? (
             <div className="pb-6 pt-6">
-              <Heading>Trending</Heading>
+              <Heading>{t("home.trending")}</Heading>
               <TrendingSkeleton />
             </div>
           ) : (
             <div className="pb-6 pt-6">
-              <Heading>Trending</Heading>
+              <Heading>{t("home.trending")}</Heading>
               <div className="flex">
                 <TrendingMovies />
               </div>
             </div>
           )}
 
-          {topPending ? (
-            <div className="pb-6">
-              <Heading>Top Rated</Heading>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {[1, 2, 3, 4, 5, 6].map((i) => (
-                  <MovieCardSkeleton key={i} />
-                ))}
-              </div>
-            </div>
-          ) : topMovies.length > 0 ? (
-            <div className="pb-6">
-              <Heading>Top Rated</Heading>
-              <StaggerContainer className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {topMovies.slice(0, 6).map((m) => (
-                  <motion.div key={m.id} variants={cardVariants}>
-                    <MovieCard movie={m} />
-                  </motion.div>
-                ))}
-              </StaggerContainer>
-            </div>
-          ) : null}
-
           {!cwPending && continueWatching.length > 0 && (
             <div className="pb-6">
-              <Heading>Continue Watching</Heading>
+              <Heading>{t("home.continueWatching")}</Heading>
               <Swiper
                 modules={[FreeMode]}
                 spaceBetween={16}
@@ -139,10 +119,32 @@ function Home() {
             </div>
           )}
 
+          {topPending ? (
+            <div className="pb-6">
+              <Heading>{t("home.topRated")}</Heading>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <MovieCardSkeleton key={i} />
+                ))}
+              </div>
+            </div>
+          ) : topMovies.length > 0 ? (
+            <div className="pb-6">
+              <Heading>{t("home.topRated")}</Heading>
+              <StaggerContainer className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {topMovies.slice(0, 6).map((m) => (
+                  <motion.div key={m.id} variants={cardVariants}>
+                    <MovieCard movie={m} />
+                  </motion.div>
+                ))}
+              </StaggerContainer>
+            </div>
+          ) : null}
+
           {/* Upcoming */}
           {upPending ? (
             <div className="pb-6">
-              <Heading>Coming Soon</Heading>
+              <Heading>{t("home.comingSoon")}</Heading>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {[1, 2, 3, 4, 5, 6].map((i) => (
                   <MovieCardSkeleton key={i} />
@@ -151,7 +153,7 @@ function Home() {
             </div>
           ) : upcomingMovies.length > 0 ? (
             <div className="pb-6">
-              <Heading>Coming Soon</Heading>
+              <Heading>{t("home.comingSoon")}</Heading>
               <StaggerContainer className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {upcomingMovies.slice(0, 6).map((m) => (
                   <motion.div key={m.id} variants={cardVariants}>
@@ -165,7 +167,7 @@ function Home() {
           {/* Recently Viewed */}
           {recentlyViewed.length > 0 && (
             <div className="pb-6">
-              <Heading>Recently Viewed</Heading>
+              <Heading>{t("home.recentlyViewed")}</Heading>
               <StaggerContainer className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {recentlyViewed.map((item) => (
                   <motion.div key={item.tmdbId} variants={cardVariants}>
@@ -195,7 +197,7 @@ function Home() {
           {/* Recommended For You */}
           {hasBookmarks && !recPending && recommended.length > 0 && (
             <div className="pb-6">
-              <Heading>Recommended For You</Heading>
+              <Heading>{t("home.recommended")}</Heading>
               <StaggerContainer className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {recommended.slice(0, 6).map((m) => (
                   <motion.div key={m.id} variants={cardVariants}>
@@ -214,14 +216,14 @@ function Home() {
 
       {query && (
         <>
-          <Heading>{`Found ${allMovies?.length ?? 0} results for "${query}"`}</Heading>
+          <Heading>{t("home.searchResults", { count: allMovies?.length ?? 0, query })}</Heading>
 
           {isFetching && (
-            <p className="mb-4 text-sm text-grayishBlue">Updating results...</p>
+            <p className="mb-4 text-sm text-grayishBlue">{t("home.updating")}</p>
           )}
 
           <StaggerContainer className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {allMovies?.length === 0 && !isPending && <p>No results found</p>}
+            {allMovies?.length === 0 && !isPending && <p>{t("home.noResults")}</p>}
             {allMovies
               ?.filter(Boolean)
               .map((movie) => (

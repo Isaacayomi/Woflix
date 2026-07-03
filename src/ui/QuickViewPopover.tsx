@@ -1,21 +1,32 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { useMoviePreview } from "../hooks/useMoviePreview";
 import { useCertification } from "../hooks/useCertification";
 import { useBookmark } from "../hooks/useBookmark";
+import { usePrefetchDetail } from "../hooks/usePrefetchDetail";
 import type { Movie } from "types";
 import SpinnerMini from "./SpinnerMini";
 
 function QuickViewPopover({ movie, inline = false }: { movie: Movie; inline?: boolean }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
+  const { prefetchVideos } = usePrefetchDetail();
   const { data: detail, isPending } = useMoviePreview(movie.id, movie.category);
   const { certification } = useCertification(movie.id);
   const { bookmarked, isPending: bmPending, handleClick } = useBookmark(movie);
 
+  const mediaType = movie.category === "tv series" ? "tv" : "movie";
   const route =
-    movie.category === "tv series"
+    mediaType === "tv"
       ? `/tv/${movie.id}`
       : `/movie/${movie.id}`;
+
+  const goToDetail = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    prefetchVideos(movie.id, mediaType);
+    navigate(route);
+  };
 
   if (inline) {
     const containerVariants = {
@@ -37,7 +48,7 @@ function QuickViewPopover({ movie, inline = false }: { movie: Movie; inline?: bo
         initial="hidden"
         animate="visible"
         className="flex flex-col gap-2 rounded-lg bg-darkBlue p-3 shadow-2xl"
-        onClick={() => navigate(route)}
+        onClick={() => goToDetail()}
       >
         {/* Rating, year, certification, category */}
         <motion.div variants={itemVariants} className="flex items-center gap-2 text-xs text-white/70">
@@ -94,8 +105,7 @@ function QuickViewPopover({ movie, inline = false }: { movie: Movie; inline?: bo
         <motion.div variants={itemVariants}>
           <button
             onClick={(e) => {
-              e.stopPropagation();
-              navigate(route);
+              goToDetail(e);
             }}
             className="flex w-full items-center justify-center gap-1.5 rounded-md bg-red py-1.5 text-xs font-medium hover:bg-red/80"
           >
@@ -108,7 +118,7 @@ function QuickViewPopover({ movie, inline = false }: { movie: Movie; inline?: bo
             >
               <path d="M8 5v14l11-7z" />
             </svg>
-            Watch Now
+            {t("quickView.watchNow")}
           </button>
         </motion.div>
       </motion.div>
@@ -118,7 +128,7 @@ function QuickViewPopover({ movie, inline = false }: { movie: Movie; inline?: bo
   return (
     <div
       className="absolute left-1/2 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2 w-[calc(100%+4rem)] max-w-[90vw] min-h-[calc(100%+5rem)] flex flex-col rounded-lg bg-darkBlue shadow-2xl"
-      onClick={() => navigate(route)}
+      onClick={() => goToDetail()}
     >
       {/* Backdrop */}
       <div
@@ -148,7 +158,7 @@ function QuickViewPopover({ movie, inline = false }: { movie: Movie; inline?: bo
                   ? "/assets/icon-bookmark-full.svg"
                   : "/assets/icon-bookmark-empty.svg"
               }
-              alt="Bookmark"
+              alt={t("quickView.bookmarkAlt")}
               className="h-4 w-4"
             />
           )}
@@ -157,8 +167,7 @@ function QuickViewPopover({ movie, inline = false }: { movie: Movie; inline?: bo
         {/* Play overlay */}
         <div
           onClick={(e) => {
-            e.stopPropagation();
-            navigate(route);
+            goToDetail(e);
           }}
           className="absolute left-1/2 top-1/2 z-20 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-red/90 hover:bg-red"
         >
@@ -227,15 +236,14 @@ function QuickViewPopover({ movie, inline = false }: { movie: Movie; inline?: bo
               <span className="mt-1 inline-block h-3 w-3/4 animate-pulse rounded bg-semiDarkBlue" />
             </>
           ) : (
-            detail?.overview ?? "No overview available."
+            detail?.overview ?? t("quickView.noOverview")
           )}
         </p>
 
         {/* Action */}
         <button
           onClick={(e) => {
-            e.stopPropagation();
-            navigate(route);
+            goToDetail(e);
           }}
           className="mt-auto flex items-center justify-center gap-1.5 rounded-md bg-red py-1.5 text-xs font-medium hover:bg-red/80"
         >
@@ -248,7 +256,7 @@ function QuickViewPopover({ movie, inline = false }: { movie: Movie; inline?: bo
           >
             <path d="M8 5v14l11-7z" />
           </svg>
-          Watch Now
+          {t("quickView.watchNow")}
         </button>
       </div>
     </div>
