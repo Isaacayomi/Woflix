@@ -10,6 +10,7 @@ import {
   getDocs,
   Timestamp,
   deleteDoc,
+  writeBatch,
 } from "firebase/firestore";
 export type WatchHistoryEntry = {
   tmdbId: number;
@@ -74,4 +75,15 @@ export async function getWatchEntry(tmdbId: number): Promise<{ progress: number 
   const snap = await getDoc(ref);
   if (!snap.exists()) return null;
   return snap.data() as { progress: number };
+}
+
+export async function clearWatchHistory(): Promise<void> {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return;
+
+  const ref = collection(db, "users", uid, "history");
+  const snap = await getDocs(ref);
+  const batch = writeBatch(db);
+  snap.docs.forEach((d) => batch.delete(d.ref));
+  await batch.commit();
 }

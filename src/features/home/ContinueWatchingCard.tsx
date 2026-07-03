@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { imageUrl } from "../../lib/tmdb";
+import { usePrefetchDetail } from "../../hooks/usePrefetchDetail";
 import type { WatchHistoryEntry } from "../../services/apiWatchHistory";
 
 type Props = {
@@ -10,10 +11,20 @@ type Props = {
 
 function ContinueWatchingCard({ entry }: Props) {
   const navigate = useNavigate();
+  const { prefetchVideos } = usePrefetchDetail();
+  const mediaType = entry.category === "tv series" ? "tv" : "movie";
   const route =
-    entry.category === "tv series"
+    mediaType === "tv"
       ? `/tv/${entry.tmdbId}`
       : `/movie/${entry.tmdbId}`;
+
+  const goToDetail = () => {
+    prefetchVideos(entry.tmdbId, mediaType);
+    const params = new URLSearchParams({ play: "1" });
+    if (entry.season) params.set("season", String(entry.season));
+    if (entry.episode) params.set("episode", String(entry.episode));
+    navigate(`${route}?${params}`);
+  };
 
   const isHoverDevice = useRef(
     typeof window !== "undefined" &&
@@ -36,8 +47,8 @@ function ContinueWatchingCard({ entry }: Props) {
 
   return (
     <motion.div
-      onClick={() => navigate(route)}
-      className="group relative flex aspect-[16/9] w-full cursor-pointer flex-col rounded-lg bg-cover bg-no-repeat"
+      onClick={goToDetail}
+      className="group relative flex aspect-[16/9] w-full origin-left cursor-pointer flex-col rounded-lg bg-cover bg-no-repeat"
       style={{
         backgroundImage: `url(${imageUrl(entry.backdropPath, "w780")})`,
         zIndex: isHovered ? 50 : 1,

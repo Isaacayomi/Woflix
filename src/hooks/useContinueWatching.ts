@@ -8,7 +8,7 @@ export function useContinueWatching() {
   });
 
   const inProgress = (data || []).filter(
-    (entry) => entry.progress > 0 && entry.progress < 100,
+    (entry) => entry.progress >= 0 && entry.progress < 100,
   );
 
   return { continueWatching: inProgress, isPending };
