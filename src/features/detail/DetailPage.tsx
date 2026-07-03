@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 import { useDetail } from "../../hooks/useDetail";
 import { useVideos } from "../../hooks/useVideos";
 import { useCredits } from "../../hooks/useCredits";
@@ -29,6 +30,7 @@ import CustomVideoPlayer from "../../ui/CustomVideoPlayer";
 import StaggerContainer, { cardVariants } from "../../ui/StaggerContainer";
 
 function DetailPage() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const location = useLocation();
   const mediaType = location.pathname.startsWith("/movie") ? "movie" : "tv";
@@ -49,6 +51,8 @@ function DetailPage() {
   } = useRating(tmdbId);
   const navigate = useNavigate();
 
+  const searchParams = new URLSearchParams(location.search);
+
   useEffect(() => {
     if (!tmdbId || !detail) return;
     addRecentlyViewed({
@@ -62,17 +66,25 @@ function DetailPage() {
   useEffect(() => {
     if (!tmdbId) return;
     getWatchEntry(tmdbId).then((entry) => {
-      if (entry?.progress === 100) setWatched(true);
+      setWatchEntry(entry);
     });
   }, [tmdbId]);
 
-  const [mode, setMode] = useState<"hero" | "watch">("hero");
-  const [season, setSeason] = useState(1);
-  const [episode, setEpisode] = useState(1);
+  const [mode, setMode] = useState<"hero" | "watch">(
+    searchParams.get("play") === "1" ? "watch" : "hero",
+  );
+  const [season, setSeason] = useState(
+    Number(searchParams.get("season")) || 1,
+  );
+  const [episode, setEpisode] = useState(
+    Number(searchParams.get("episode")) || 1,
+  );
   const [muted, setMuted] = useState(false);
+  const trailerIframeRef = useRef<HTMLIFrameElement>(null);
   const [isReminded, setIsReminded] = useState(false);
   const [isLoadingReminder, setIsLoadingReminder] = useState(false);
-  const [watched, setWatched] = useState(false);
+  const [watchEntry, setWatchEntry] = useState<{ progress: number } | null>(null);
+  const watched = watchEntry?.progress === 100;
 
   useEffect(() => {
     if (!tmdbId) return;
@@ -111,8 +123,16 @@ function DetailPage() {
 
   const heroVideoUrl =
     trailerKey && mode === "hero"
-      ? `https://www.youtube.com/embed/${trailerKey}?autoplay=1&mute=${muted ? 1 : 0}&loop=1&controls=0&playlist=${trailerKey}&rel=0&showinfo=0&modestbranding=1&iv_load_policy=3`
+      ? `https://www.youtube.com/embed/${trailerKey}?autoplay=1&mute=1&loop=1&controls=0&playlist=${trailerKey}&rel=0&showinfo=0&modestbranding=1&iv_load_policy=3&enablejsapi=1`
       : null;
+
+  useEffect(() => {
+    if (!trailerIframeRef.current?.contentWindow) return;
+    trailerIframeRef.current.contentWindow.postMessage(
+      JSON.stringify({ event: "command", func: muted ? "mute" : "unMute", args: "" }),
+      "https://www.youtube.com",
+    );
+  }, [muted]);
 
   const airedSeasons = detail?.seasons?.filter(
     (s) => s.air_date && s.episode_count > 0 && s.season_number > 0,
@@ -120,6 +140,16 @@ function DetailPage() {
 
   const handleSelectEpisode = (ep: { episode_number: number }) => {
     setEpisode(ep.episode_number);
+    updateWatchProgress(tmdbId, {
+      title,
+      category: "tv series",
+      posterPath: detail!.poster_path,
+      backdropPath: detail!.backdrop_path,
+      progress: 1,
+      season,
+      episode: ep.episode_number,
+    });
+    setWatchEntry({ progress: 1 });
     setMode("watch");
   };
 
@@ -127,7 +157,7 @@ function DetailPage() {
   if (!detail)
     return (
       <div className="flex h-screen items-center justify-center text-white">
-        Content not found
+        {t("detail.notFound")}
       </div>
     );
 
@@ -146,11 +176,19 @@ function DetailPage() {
         {heroVideoUrl ? (
           <div className="pointer-events-none absolute inset-0 overflow-hidden">
             <iframe
-              key={String(muted)}
+              ref={trailerIframeRef}
               className="absolute left-1/2 top-0 -translate-x-1/2 md:top-1/2 md:-translate-y-1/2 h-[56.25vw] min-h-[100vh] w-[100vw] min-w-[177.77vh]"
               src={heroVideoUrl}
               title={title}
               allow="autoplay"
+              onLoad={() => {
+                setTimeout(() => {
+                  trailerIframeRef.current?.contentWindow?.postMessage(
+                    JSON.stringify({ event: "command", func: "unMute", args: "" }),
+                    "https://www.youtube.com",
+                  );
+                }, 500);
+              }}
             />
           </div>
         ) : (
@@ -170,7 +208,7 @@ function DetailPage() {
         <button
           onClick={() => navigate(-1)}
           className="absolute left-6 top-6 z-30 flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm hover:bg-black/70"
-          aria-label="Go back"
+          aria-label={t("detail.back")}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -202,7 +240,7 @@ function DetailPage() {
             )}
             {detail.runtime && <span>{detail.runtime} min</span>}
             {detail.number_of_seasons && (
-              <span>{detail.number_of_seasons} seasons</span>
+              <span>{detail.number_of_seasons} {t("detail.seasonPrefix").toLowerCase()}s</span>
             )}
           </div>
 
@@ -243,7 +281,7 @@ function DetailPage() {
               >
                 <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
               </svg>
-              Part of{" "}
+              {t("detail.partOf")}
               <span className="font-medium text-red">
                 {detail.belongs_to_collection.name}
               </span>
@@ -255,7 +293,7 @@ function DetailPage() {
 
           {/* User rating */}
           <div className="mt-4">
-            <span className="mr-3 text-xs text-white/50">Your Rating</span>
+            <span className="mr-3 text-xs text-white/50">{t("detail.yourRating")}</span>
             <StarRating
               rating={userRating}
               onRate={(r) =>
@@ -288,7 +326,7 @@ function DetailPage() {
                     <circle cx="12" cy="12" r="10" />
                     <polyline points="12 6 12 12 16 14" />
                   </svg>
-                  Coming Soon
+                  {t("detail.comingSoon")}
                 </span>
                 <button
                   onClick={handleToggleReminder}
@@ -309,7 +347,7 @@ function DetailPage() {
                     <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
                     <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
                   </svg>
-                  {isReminded ? "Reminded" : "Remind Me"}
+                  {isReminded ? t("detail.reminded") : t("detail.remindMe")}
                 </button>
               </>
             ) : (
@@ -320,9 +358,10 @@ function DetailPage() {
                     category: mediaType === "movie" ? "movie" : "tv series",
                     posterPath: detail.poster_path,
                     backdropPath: detail.backdrop_path,
-                    progress: 0,
+                    progress: 1,
                     ...(mediaType === "tv" ? { season, episode } : {}),
                   });
+                  setWatchEntry({ progress: 1 });
                   setMode("watch");
                 }}
                 className="flex items-center gap-2 rounded-full bg-red px-6 py-3 hover:bg-red/80"
@@ -336,7 +375,11 @@ function DetailPage() {
                 >
                   <path d="M8 5v14l11-7z" />
                 </svg>
-                <span className="text-sm font-medium">Watch Now</span>
+                <span className="text-sm font-medium">
+                  {watchEntry && watchEntry.progress > 0 && watchEntry.progress < 100
+                    ? t("detail.continueWatching")
+                    : t("detail.watchNow")}
+                </span>
               </button>
             )}
             {mediaType === "tv" && (
@@ -354,7 +397,7 @@ function DetailPage() {
             <button
               onClick={() => {
                 navigator.clipboard.writeText(window.location.href);
-                toast.success("Link copied to clipboard", {
+                toast.success(t("detail.linkCopied"), {
                   style: { fontSize: "0.875rem", textAlign: "center" },
                 });
               }}
@@ -377,7 +420,7 @@ function DetailPage() {
                 <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
                 <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
               </svg>
-              Share
+              {t("detail.share")}
             </button>
 
             {/* Mark as Watched */}
@@ -392,8 +435,8 @@ function DetailPage() {
                     progress: 100,
                     ...(mediaType === "tv" ? { season, episode } : {}),
                   });
-                  setWatched(true);
-                  toast.success("Marked as watched", {
+                  setWatchEntry({ progress: 100 });
+                  toast.success(t("detail.markedWatched"), {
                     style: { fontSize: "0.875rem", textAlign: "center" },
                   });
                 }}
@@ -416,7 +459,7 @@ function DetailPage() {
                 >
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
-                Watched
+                {t("detail.watched")}
               </button>
             )}
           </div>
@@ -430,7 +473,7 @@ function DetailPage() {
         {mediaType === "tv" && (
           <section className="px-6 pb-8 pt-6 md:px-12">
             <h2 className="mb-4 text-xl font-semibold">
-              Episodes — Season {season}
+              {t("detail.episodesHeading", { season })}
             </h2>
             <EpisodeList
               seriesId={tmdbId}
@@ -443,7 +486,7 @@ function DetailPage() {
         {/* Similar */}
         {similar.length > 0 && (
           <section className="px-6 pb-8 md:px-12">
-            <h2 className="mb-4 text-xl font-semibold">More Like This</h2>
+            <h2 className="mb-4 text-xl font-semibold">{t("detail.moreLikeThis")}</h2>
             <StaggerContainer className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
               {similar.map((m) => (
                 <motion.div key={m.id} variants={cardVariants}>
@@ -457,7 +500,7 @@ function DetailPage() {
         {/* Recommendations */}
         {recommendations.length > 0 && (
           <section className="px-6 pb-12 md:px-12">
-            <h2 className="mb-4 text-xl font-semibold">Recommendations</h2>
+            <h2 className="mb-4 text-xl font-semibold">{t("detail.recommendations")}</h2>
             <StaggerContainer className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
               {recommendations.map((m) => (
                 <motion.div key={m.id} variants={cardVariants}>

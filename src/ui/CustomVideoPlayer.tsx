@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 
 const PROVIDERS = [
   {
@@ -22,6 +23,8 @@ type CustomVideoPlayerProps = {
   onClose: () => void;
 };
 
+const PROVIDER_NAMES = ["VidSrc", "2Embed"];
+
 export default function CustomVideoPlayer({
   tmdbId,
   mediaType,
@@ -30,6 +33,7 @@ export default function CustomVideoPlayer({
   title,
   onClose,
 }: CustomVideoPlayerProps) {
+  const { t } = useTranslation();
   const [providerIndex, setProviderIndex] = useState(0);
   const [loaded, setLoaded] = useState(false);
   const [iframeError, setIframeError] = useState(false);
@@ -72,7 +76,7 @@ export default function CustomVideoPlayer({
         <button
           onClick={onClose}
           className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white/80 hover:bg-white/20 hover:text-white"
-          aria-label="Close"
+          aria-label={t("videoPlayer.close")}
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
@@ -84,19 +88,19 @@ export default function CustomVideoPlayer({
         <div className="flex-1" />
 
         <span className="hidden rounded bg-white/10 px-2 py-0.5 text-[10px] font-medium text-white/50 md:inline">
-          {currentProvider.name}
+          {t(`videoPlayer.provider${PROVIDER_NAMES[providerIndex]}`)}
         </span>
 
         <button
           onClick={switchProvider}
           className="flex items-center gap-1 rounded-full bg-white/10 px-3 py-1 text-xs text-white/70 hover:bg-white/20 hover:text-white"
-          title="Switch provider"
+          title={t("videoPlayer.switchProvider")}
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="23 4 23 10 17 10" /><polyline points="1 20 1 14 7 14" />
             <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
           </svg>
-          <span className="hidden md:inline">Switch</span>
+          <span className="hidden md:inline">{t("videoPlayer.switch")}</span>
         </button>
       </div>
 
@@ -111,24 +115,24 @@ export default function CustomVideoPlayer({
         {iframeError && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
             <p className="text-sm text-white/50">
-              Failed to load from <span className="font-medium text-white/70">{currentProvider.name}</span>
+              {t("videoPlayer.failedToLoad")}<span className="font-medium text-white/70">{t(`videoPlayer.provider${PROVIDER_NAMES[providerIndex]}`)}</span>
             </p>
             <div className="flex gap-3">
               <button
                 onClick={retry}
                 className="rounded-full bg-white/10 px-5 py-2 text-sm text-white hover:bg-white/20"
               >
-                Retry
+                {t("videoPlayer.retry")}
               </button>
               <button
                 onClick={switchProvider}
                 className="rounded-full bg-red px-5 py-2 text-sm font-medium hover:bg-red/80"
               >
-                Try {PROVIDERS[(providerIndex + 1) % PROVIDERS.length].name}
+                {t("videoPlayer.tryProvider", { name: t(`videoPlayer.provider${PROVIDER_NAMES[(providerIndex + 1) % PROVIDERS.length]}`) })}
               </button>
             </div>
             <button onClick={onClose} className="text-xs text-white/30 hover:text-white/60">
-              Close
+              {t("videoPlayer.close")}
             </button>
           </div>
         )}

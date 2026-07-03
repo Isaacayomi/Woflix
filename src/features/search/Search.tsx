@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useLocation, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 function Search() {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
   const [value, setValue] = useState(searchParams.get("q") || "");
@@ -21,13 +23,13 @@ function Search() {
 
   useEffect(() => {
     const path = location.pathname;
-    if (path === "/") setHolder("Search for movies or TV series");
-    else if (path === "/movies") setHolder("Search for movies");
-    else if (path === "/series") setHolder("Search for TV series");
+    if (path === "/") setHolder(t("search.allPlaceholder"));
+    else if (path === "/movies") setHolder(t("search.moviesPlaceholder"));
+    else if (path === "/series") setHolder(t("search.seriesPlaceholder"));
     else if (path.match(/^\/(categories\/\d+|browse\/|platform\/|collection\/)/))
-      setHolder("Search for Movies/Shows");
-    else setHolder("Search for Bookmarked Shows");
-  }, [location.pathname]);
+      setHolder(t("search.browsePlaceholder"));
+    else setHolder(t("search.bookmarksPlaceholder"));
+  }, [location.pathname, t]);
 
   if (isDetailRoute) return null;
 
@@ -35,7 +37,7 @@ function Search() {
     <div className="flex w-full items-center gap-4">
       <img
         src="/assets/icon-search.svg"
-        alt="Search icon"
+        alt={t("search.iconAlt")}
         className="h-5 w-5 object-contain sm:h-6 sm:w-6 lg:h-8 lg:w-8"
       />
       <input

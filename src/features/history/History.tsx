@@ -1,4 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { getWatchHistory, removeFromHistory } from "../../services/apiWatchHistory";
 import Heading from "../../ui/Heading";
 import Spinner from "../../ui/Spinner";
@@ -6,6 +7,7 @@ import { imageUrl } from "../../lib/tmdb";
 import { Link } from "react-router-dom";
 
 function History() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { data: entries, isPending } = useQuery({
     queryKey: ["watchHistory"],
@@ -19,13 +21,13 @@ function History() {
 
   return (
     <div className="h-screen">
-      <Heading>Watch History</Heading>
+      <Heading>{t("history.heading")}</Heading>
 
       {isPending && <Spinner />}
 
       {!isPending && (!entries || entries.length === 0) && (
         <p className="mt-8 text-center text-grayishBlue">
-          No watch history yet.
+          {t("history.empty")}
         </p>
       )}
 
@@ -64,14 +66,14 @@ function History() {
                 </p>
               )}
               <p className="text-xs text-grayishBlue">
-                {entry.category === "movie" ? "Movie" : "TV Series"}
+                {entry.category === "movie" ? t("history.movieLabel") : t("history.seriesLabel")}
               </p>
             </div>
 
             <button
               onClick={() => handleRemove(entry.tmdbId)}
               className="flex-shrink-0 text-grayishBlue hover:text-red"
-              title="Remove from history"
+              title={t("history.removeTitle")}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

@@ -1,6 +1,7 @@
 import { imageUrl } from "../../lib/tmdb";
 import { useSeasonDetails } from "../../hooks/useSeasonDetails";
 import type { TMDBEpisode } from "types";
+import i18n from "../../lib/i18n/config";
 
 type EpisodeListProps = {
   seriesId: number;
@@ -79,7 +80,7 @@ function EpisodeList({ seriesId, seasonNumber, onSelectEpisode }: EpisodeListPro
               <h4 className="text-sm font-semibold leading-tight">{ep.name}</h4>
               {ep.air_date && (
                 <span className="shrink-0 text-[11px] text-white/40">
-                  {new Date(ep.air_date).toLocaleDateString("en-US", {
+                  {new Date(ep.air_date).toLocaleDateString(i18n.language, {
                     month: "short",
                     day: "numeric",
                   })}

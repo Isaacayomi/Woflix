@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { getBookmark } from "../../services/apiBookmark";
 import MovieCard from "../../ui/MovieCard";
@@ -11,6 +12,7 @@ import StaggerContainer, { cardVariants } from "../../ui/StaggerContainer";
 type Tab = "all" | "movie" | "tv series";
 
 function Bookmark() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const query = searchParams.get("q") || "";
   const [tab, setTab] = useState<Tab>("all");
@@ -40,16 +42,16 @@ function Bookmark() {
   if (allBookmarked.length === 0 && !query) {
     return (
       <div className="h-screen">
-        <Heading>Bookmarked TV Series</Heading>
+        <Heading>{t("bookmarks.heading")}</Heading>
         <div className="mt-16 flex flex-col items-center gap-4 text-center">
           <img
             src="/assets/icon-nav-bookmark.svg"
-            alt="bookmark"
+            alt={t("bookmarks.bookmarkAlt")}
             className="h-16 w-16 opacity-30"
           />
-          <p className="text-lg text-grayishBlue">Your list is empty</p>
+          <p className="text-lg text-grayishBlue">{t("bookmarks.emptyTitle")}</p>
           <p className="text-sm text-grayishBlue/60">
-            Bookmark movies and TV series to see them here
+            {t("bookmarks.emptyDesc")}
           </p>
         </div>
       </div>
@@ -59,28 +61,28 @@ function Bookmark() {
   return (
     <div className="h-screen">
       {!query ? (
-        <Heading>Bookmarked TV Series</Heading>
+        <Heading>{t("bookmarks.heading")}</Heading>
       ) : (
-        <Heading>{`Found ${displayedMovies?.length} results for "${query}"`}</Heading>
+        <Heading>{t("bookmarks.searchResults", { count: displayedMovies?.length ?? 0, query })}</Heading>
       )}
 
       {!query && (
         <div className="mb-6 flex gap-2">
           {[
-            { key: "all" as Tab, label: `All (${allBookmarked.length})` },
-            { key: "movie" as Tab, label: `Movies (${movieCount})` },
-            { key: "tv series" as Tab, label: `Series (${seriesCount})` },
-          ].map((t) => (
+            { key: "all" as Tab, label: t("bookmarks.tabAll", { count: allBookmarked.length }) },
+            { key: "movie" as Tab, label: t("bookmarks.tabMovies", { count: movieCount }) },
+            { key: "tv series" as Tab, label: t("bookmarks.tabSeries", { count: seriesCount }) },
+          ].map((tabItem) => (
             <button
-              key={t.key}
-              onClick={() => setTab(t.key)}
+              key={tabItem.key}
+              onClick={() => setTab(tabItem.key)}
               className={`rounded-full px-3 py-1 text-sm transition-colors ${
-                tab === t.key
+                tab === tabItem.key
                   ? "bg-red text-white"
                   : "bg-semiDarkBlue text-white hover:bg-white/20"
               }`}
             >
-              {t.label}
+              {tabItem.label}
             </button>
           ))}
         </div>
@@ -102,7 +104,9 @@ function Bookmark() {
             ))}
             {displayedMovies.length === 0 && (
               <p className="col-span-full text-center text-grayishBlue">
-                No bookmarked {tab === "all" ? "items" : tab === "movie" ? "movies" : "series"} found
+                {t("bookmarks.emptyFilter", {
+                  type: tab === "all" ? t("bookmarks.emptyFilterAll") : tab === "movie" ? t("bookmarks.emptyFilterMovie") : t("bookmarks.emptyFilterSeries"),
+                })}
               </p>
             )}
           </StaggerContainer>
