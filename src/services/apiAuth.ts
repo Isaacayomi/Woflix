@@ -3,6 +3,8 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,
+  GoogleAuthProvider,
+  signInWithPopup,
 } from "firebase/auth";
 import type { AuthProps } from "types";
 
@@ -26,4 +28,9 @@ export async function getCurrentUser() {
 
 export async function logoutApi() {
   await signOut(auth);
+}
+
+export function googleLoginApi() {
+  const provider = new GoogleAuthProvider();
+  return signInWithPopup(auth, provider);
 }
