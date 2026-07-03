@@ -1,5 +1,11 @@
 import { useEffect, useRef } from "react";
-import { Outlet, Link, NavLink, useLocation, useNavigate } from "react-router-dom";
+import {
+  Outlet,
+  Link,
+  NavLink,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import Search from "../features/search/Search";
@@ -72,7 +78,10 @@ function AppLayout() {
                       className="h-8 w-8 overflow-hidden rounded-full border border-white/50"
                     >
                       <img
-                        src={auth.currentUser?.photoURL || "/assets/image-avatar.png"}
+                        src={
+                          auth.currentUser?.photoURL ||
+                          "/assets/image-avatar.png"
+                        }
                         alt=""
                         className="h-full w-full object-cover"
                       />
