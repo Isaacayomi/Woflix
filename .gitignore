@@ -26,3 +26,8 @@ dist-ssr
 .env
 .env.local
 *.tsbuildinfo
+
+# Cloudflare Worker proxy
+proxy/node_modules
+proxy/.wrangler
+proxy/dist
