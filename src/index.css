@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --plyr-color-main: #fc4747;
+  --plyr-video-background: #10141e;
+  --plyr-menu-background: #161d2f;
+}
