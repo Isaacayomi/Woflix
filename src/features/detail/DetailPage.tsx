@@ -11,6 +11,8 @@ import { useRecommendations } from "../../hooks/useRecommendations";
 import { imageUrl } from "../../lib/tmdb";
 import { isUnreleased } from "../../lib/releaseStatus";
 import { updateWatchProgress } from "../../services/apiWatchHistory";
+import { updateBookmark } from "../../services/apiUpdateBookmark";
+import { getBookmark } from "../../services/apiBookmark";
 import {
   getReminder,
   setReminder,
@@ -27,6 +29,7 @@ import CastRow from "./CastRow";
 import EpisodeList from "./EpisodeList";
 import StarRating from "./StarRating";
 import CustomVideoPlayer from "../../ui/CustomVideoPlayer";
+import CustomPlayer from "../../ui/CustomPlayer";
 import StaggerContainer, { cardVariants } from "../../ui/StaggerContainer";
 
 function DetailPage() {
@@ -70,6 +73,19 @@ function DetailPage() {
     });
   }, [tmdbId]);
 
+  useEffect(() => {
+    if (!tmdbId) return;
+    getWatchEntry(tmdbId).then((entry) => {
+      setDemoWatchEntry(entry);
+    });
+  }, [tmdbId]);
+
+  const DEMO_SOURCES: Record<number, string> = {
+    10378: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    45745: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
+    133701: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+  };
+
   const [mode, setMode] = useState<"hero" | "watch">(
     searchParams.get("play") === "1" ? "watch" : "hero",
   );
@@ -84,12 +100,45 @@ function DetailPage() {
   const [isReminded, setIsReminded] = useState(false);
   const [isLoadingReminder, setIsLoadingReminder] = useState(false);
   const [watchEntry, setWatchEntry] = useState<{ progress: number } | null>(null);
+  const [demoMode, setDemoMode] = useState(false);
+  const [demoWatchEntry, setDemoWatchEntry] = useState<{ progress: number; resumeSeconds?: number } | null>(null);
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [bookmarkPending, setBookmarkPending] = useState(false);
+  const [trailerReady, setTrailerReady] = useState(false);
   const watched = watchEntry?.progress === 100;
 
   useEffect(() => {
     if (!tmdbId) return;
     getReminder(tmdbId).then((r) => setIsReminded(!!r));
   }, [tmdbId]);
+
+  useEffect(() => {
+    if (!tmdbId) return;
+    getBookmark().then((items) => {
+      setIsBookmarked(items.some((item) => item.id === tmdbId));
+    });
+  }, [tmdbId]);
+
+  const toggleBookmark = async () => {
+    if (bookmarkPending) return;
+    setBookmarkPending(true);
+    const newValue = !isBookmarked;
+    setIsBookmarked(newValue);
+    try {
+      await updateBookmark({ newValue, id: tmdbId });
+      toast.success(
+        newValue
+          ? `${title} has been added to bookmarks`
+          : `${title} has been removed from bookmarks`,
+        { style: { fontSize: "0.875rem", textAlign: "center" } },
+      );
+    } catch {
+      setIsBookmarked(!newValue);
+      toast.error("Failed to update bookmark");
+    } finally {
+      setBookmarkPending(false);
+    }
+  };
 
   const handleToggleReminder = async () => {
     if (isLoadingReminder) return;
@@ -125,6 +174,10 @@ function DetailPage() {
     trailerKey && mode === "hero"
       ? `https://www.youtube.com/embed/${trailerKey}?autoplay=1&mute=1&loop=1&controls=0&playlist=${trailerKey}&rel=0&showinfo=0&modestbranding=1&iv_load_policy=3&enablejsapi=1`
       : null;
+
+  useEffect(() => {
+    setTrailerReady(false);
+  }, [heroVideoUrl]);
 
   useEffect(() => {
     if (!trailerIframeRef.current?.contentWindow) return;
@@ -173,15 +226,29 @@ function DetailPage() {
     <div className="min-h-screen">
       {/* Hero */}
       <div className="fixed inset-0 z-10 h-screen bg-darkBlue">
-        {heroVideoUrl ? (
+        <img
+          src={backdropImage}
+          alt={title}
+          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
+            trailerReady ? "opacity-0" : "opacity-100"
+          }`}
+          onError={(e) => {
+            (e.target as HTMLImageElement).style.display = "none";
+          }}
+        />
+
+        {heroVideoUrl && (
           <div className="pointer-events-none absolute inset-0 overflow-hidden">
             <iframe
               ref={trailerIframeRef}
-              className="absolute left-1/2 top-0 -translate-x-1/2 md:top-1/2 md:-translate-y-1/2 h-[56.25vw] min-h-[100vh] w-[100vw] min-w-[177.77vh]"
+              className={`absolute left-1/2 top-0 -translate-x-1/2 md:top-1/2 md:-translate-y-1/2 h-[56.25vw] min-h-[100vh] w-[100vw] min-w-[177.77vh] transition-opacity duration-700 ${
+                trailerReady ? "opacity-100" : "opacity-0"
+              }`}
               src={heroVideoUrl}
               title={title}
               allow="autoplay"
               onLoad={() => {
+                setTrailerReady(true);
                 setTimeout(() => {
                   trailerIframeRef.current?.contentWindow?.postMessage(
                     JSON.stringify({ event: "command", func: "unMute", args: "" }),
@@ -191,15 +258,6 @@ function DetailPage() {
               }}
             />
           </div>
-        ) : (
-          <img
-            src={backdropImage}
-            alt={title}
-            className="absolute inset-0 h-full w-full object-cover"
-            onError={(e) => {
-              (e.target as HTMLImageElement).style.display = "none";
-            }}
-          />
         )}
 
         <div className="absolute inset-0 bg-gradient-to-t from-darkBlue via-darkBlue/70 to-transparent" />
@@ -423,6 +481,53 @@ function DetailPage() {
               {t("detail.share")}
             </button>
 
+            {/* Bookmark */}
+            <button
+              onClick={toggleBookmark}
+              disabled={bookmarkPending}
+              className={`flex items-center gap-2 rounded-full px-4 py-3 text-sm ${
+                isBookmarked
+                  ? "bg-red/20 text-red border border-red/40"
+                  : "bg-white/10 text-white hover:bg-white/20 border border-transparent"
+              } disabled:opacity-50`}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill={isBookmarked ? "currentColor" : "none"}
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+              </svg>
+              <span className="text-sm font-medium">
+                {isBookmarked ? t("detail.bookmarked") : t("detail.bookmark")}
+              </span>
+            </button>
+
+            {/* Watch Demo */}
+            {DEMO_SOURCES[tmdbId] && (
+              <button
+                onClick={() => setDemoMode(true)}
+                className="flex items-center gap-2 rounded-full border border-red/50 px-6 py-3 text-sm text-red hover:bg-red/10"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+                <span className="text-sm font-medium">{t("detail.watchDemo")}</span>
+              </button>
+            )}
+
             {/* Mark as Watched */}
             {!unreleased && (
               <button
@@ -562,6 +667,35 @@ function DetailPage() {
           episode={episode}
           title={title}
           onClose={() => setMode("hero")}
+        />
+      )}
+
+      {/* Demo Player */}
+      {demoMode && DEMO_SOURCES[tmdbId] && (
+        <CustomPlayer
+          src={DEMO_SOURCES[tmdbId]}
+          poster={backdropImage || undefined}
+          resumeAt={
+            demoWatchEntry && demoWatchEntry.progress > 0 && demoWatchEntry.progress < 100
+              ? demoWatchEntry.resumeSeconds
+              : undefined
+          }
+          title={title}
+          onProgress={(currentTime, duration) => {
+            if (duration && duration > 0) {
+              const pct = Math.min(Math.round((currentTime / duration) * 100), 99);
+              updateWatchProgress(tmdbId, {
+                title,
+                category: mediaType === "movie" ? "movie" : "tv series",
+                posterPath: detail.poster_path,
+                backdropPath: detail.backdrop_path,
+                progress: pct,
+                resumeSeconds: Math.round(currentTime),
+                ...(mediaType === "tv" ? { season, episode } : {}),
+              });
+            }
+          }}
+          onClose={() => setDemoMode(false)}
         />
       )}
     </div>
