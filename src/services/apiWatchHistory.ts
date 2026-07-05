@@ -21,6 +21,7 @@ export type WatchHistoryEntry = {
   season?: number;
   episode?: number;
   progress: number;
+  resumeSeconds?: number;
   watchedAt: Timestamp;
 };
 
@@ -34,6 +35,7 @@ export async function updateWatchProgress(
     season?: number;
     episode?: number;
     progress: number;
+    resumeSeconds?: number;
   },
 ): Promise<void> {
   const uid = auth.currentUser?.uid;
@@ -67,14 +69,16 @@ export async function removeFromHistory(tmdbId: number): Promise<void> {
   await deleteDoc(ref);
 }
 
-export async function getWatchEntry(tmdbId: number): Promise<{ progress: number } | null> {
+export async function getWatchEntry(
+  tmdbId: number,
+): Promise<{ progress: number; resumeSeconds?: number } | null> {
   const uid = auth.currentUser?.uid;
   if (!uid) return null;
 
   const ref = doc(db, "users", uid, "history", String(tmdbId));
   const snap = await getDoc(ref);
   if (!snap.exists()) return null;
-  return snap.data() as { progress: number };
+  return snap.data() as { progress: number; resumeSeconds?: number };
 }
 
 export async function clearWatchHistory(): Promise<void> {
