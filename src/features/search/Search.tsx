@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
-import { useLocation, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 function Search() {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const [value, setValue] = useState(searchParams.get("q") || "");
   const [holder, setHolder] = useState("");
   const isDetailRoute = location.pathname.match(/^\/(movie|tv)\/\d+$|^\/history$/);
+  const isBrowsePage = location.pathname.match(/^\/(categories\/\d+|browse\/|platform\/|collection\/)/);
 
   // Sync from URL when navigating to a new page
   useEffect(() => {
@@ -18,7 +20,11 @@ function Search() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value;
     setValue(raw);
-    setSearchParams(raw.trim() ? { q: raw } : {});
+    if (isBrowsePage) {
+      navigate(raw.trim() ? `/?q=${encodeURIComponent(raw.trim())}` : "/");
+    } else {
+      setSearchParams(raw.trim() ? { q: raw } : {});
+    }
   };
 
   useEffect(() => {
