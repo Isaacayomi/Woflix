@@ -33,7 +33,7 @@ function AppLayout() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-darkBlue font-outfit text-white">
+      <div className="h-screen overflow-hidden bg-darkBlue font-outfit text-white">
         <div className="mx-auto flex max-w-[1500px] gap-9 p-8 pb-20 lg:pb-8">
           <Navbar />
 
