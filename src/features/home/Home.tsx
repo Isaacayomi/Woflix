@@ -1,7 +1,7 @@
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { FreeMode } from "swiper/modules";
+import { FreeMode, Mousewheel } from "swiper/modules";
 import { useTranslation } from "react-i18next";
 import { useHomeMovies } from "../../hooks/useHomeMovies";
 import { useHeroMovies } from "../../hooks/useHeroMovies";
@@ -99,10 +99,11 @@ function Home() {
             <div className="pb-6">
               <Heading>{t("home.continueWatching")}</Heading>
               <Swiper
-                modules={[FreeMode]}
+                modules={[FreeMode, Mousewheel]}
                 spaceBetween={16}
                 freeMode
                 grabCursor
+                mousewheel={{ forceToAxis: true }}
                 className="-my-2 py-2"
                 breakpoints={{
                   320: { slidesPerView: 1.5, spaceBetween: 8, slidesOffsetAfter: 16 },

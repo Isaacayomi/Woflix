@@ -1,7 +1,7 @@
 import "swiper/css";
 import "swiper/css/free-mode";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, FreeMode } from "swiper/modules";
+import { Autoplay, FreeMode, Mousewheel } from "swiper/modules";
 import { useTrendingMovies } from "../../hooks/useTrendingMovie";
 import TrendingMovieCard from "./TrendingMovieCard";
 
@@ -12,9 +12,10 @@ function TrendingMovie() {
 
   return (
     <Swiper
-      modules={[Autoplay, FreeMode]}
+      modules={[Autoplay, FreeMode, Mousewheel]}
       spaceBetween={32}
       grabCursor
+      mousewheel={{ forceToAxis: true }}
       loop
       autoplay={{
         delay: 3000,

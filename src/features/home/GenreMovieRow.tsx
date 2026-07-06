@@ -1,5 +1,5 @@
 import { Swiper, SwiperSlide } from "swiper/react";
-import { FreeMode } from "swiper/modules";
+import { FreeMode, Mousewheel } from "swiper/modules";
 import { useGenreMovies } from "../../hooks/useGenreMovies";
 import Heading from "../../ui/Heading";
 import MovieCard from "../../ui/MovieCard";
@@ -18,10 +18,11 @@ function GenreMovieRow({ genreId, genreName }: Props) {
     <div className="pb-6">
       <Heading>{genreName}</Heading>
       <Swiper
-        modules={[FreeMode]}
+        modules={[FreeMode, Mousewheel]}
         spaceBetween={16}
         freeMode
         grabCursor
+        mousewheel={{ forceToAxis: true }}
         className="-my-2 py-2"
         breakpoints={{
           320: { slidesPerView: 1.5, spaceBetween: 8, slidesOffsetAfter: 16 },
