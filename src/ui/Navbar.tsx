@@ -1,6 +1,4 @@
-import { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { motion } from "framer-motion";
 import { useLogout } from "../hooks/useLogout";
 import { useTranslation } from "react-i18next";
 import { auth } from "../lib/firebase";
@@ -64,15 +62,9 @@ function NavIcon({ icon }: { icon: string }) {
 function Navbar() {
   const { t } = useTranslation();
   const { logout, isPending } = useLogout();
-  const [expanded, setExpanded] = useState(false);
 
   return (
-    <nav
-      onMouseEnter={() => window.innerWidth >= 1024 && setExpanded(true)}
-      onMouseLeave={() => window.innerWidth >= 1024 && setExpanded(false)}
-      className={`fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around bg-semiDarkBlue px-4 py-3 transition-all duration-300 lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:flex-shrink-0 lg:flex-col lg:justify-between lg:rounded-[1.25rem] lg:py-8 ${
-        expanded ? "lg:w-[9rem] lg:px-5" : "lg:w-[6rem]"
-      }`}>
+    <nav className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around bg-semiDarkBlue px-4 py-3 lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:w-[6rem] lg:flex-shrink-0 lg:flex-col lg:justify-between lg:rounded-[1.25rem] lg:py-8">
       <img
         src="/assets/icon-nav-movies.svg"
         alt={t("nav.navIconAlt")}
@@ -85,25 +77,13 @@ function Navbar() {
             key={item.to}
             to={item.to}
             className={({ isActive }) =>
-              `flex items-center gap-3 lg:w-full ${
-                expanded ? "lg:justify-start lg:px-5" : "lg:justify-center"
-              } ${
-                isActive ? "text-white" : "text-grayishBlue"
-              } transition-colors duration-200 hover:text-red focus:border-none focus:text-white focus:outline-none`
+              `group/item relative flex items-center justify-center lg:w-full ${isActive ? "text-white" : "text-grayishBlue"} transition-colors duration-200 hover:text-red focus:border-none focus:text-white focus:outline-none`
             }
-            title={t(`nav.${item.key}`)}
           >
             <NavIcon icon={item.icon} />
-            <motion.span
-              className="text-xs font-medium whitespace-nowrap overflow-hidden"
-              animate={{
-                maxWidth: expanded ? 100 : 0,
-                opacity: expanded ? 1 : 0,
-              }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-            >
+            <span className="pointer-events-none absolute left-full top-1/2 z-[9999] ml-3 hidden -translate-y-1/2 whitespace-nowrap rounded-md bg-red px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity duration-200 before:absolute before:right-full before:top-1/2 before:-translate-y-1/2 before:border-4 before:border-transparent before:border-r-red group-hover/item:opacity-100 lg:block">
               {t(`nav.${item.key}`)}
-            </motion.span>
+            </span>
           </NavLink>
         ))}
       </div>
@@ -111,10 +91,7 @@ function Navbar() {
       <div className="hidden items-center gap-3 lg:mt-auto lg:flex lg:flex-col lg:pb-12">
         <NavLink
           to="/profile"
-          className={`flex items-center gap-3 lg:w-full ${
-            expanded ? "lg:justify-start lg:px-5" : "lg:justify-center"
-          } text-grayishBlue transition-colors duration-200 hover:text-white focus:outline-none`}
-          title={t("nav.profile")}
+          className="group/item relative flex items-center justify-center lg:w-full text-grayishBlue transition-colors duration-200 hover:text-white focus:outline-none"
         >
           <div className="h-[2.5rem] w-[2.5rem] shrink-0 overflow-hidden rounded-full border border-white">
             <img
@@ -123,25 +100,15 @@ function Navbar() {
               className="h-full w-full object-cover"
             />
           </div>
-          <motion.span
-            className="text-xs font-medium whitespace-nowrap overflow-hidden"
-            animate={{
-              maxWidth: expanded ? 80 : 0,
-              opacity: expanded ? 1 : 0,
-            }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-          >
+          <span className="pointer-events-none absolute left-full top-1/2 z-[9999] ml-3 hidden -translate-y-1/2 whitespace-nowrap rounded-md bg-red px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity duration-200 before:absolute before:right-full before:top-1/2 before:-translate-y-1/2 before:border-4 before:border-transparent before:border-r-red group-hover/item:opacity-100 lg:block">
             {t("nav.profile")}
-          </motion.span>
+          </span>
         </NavLink>
 
         <button
           onClick={() => logout()}
           disabled={isPending}
-          className={`flex items-center gap-3 lg:w-full ${
-            expanded ? "lg:justify-start lg:px-5" : "lg:justify-center"
-          } text-grayishBlue transition-colors duration-200 hover:text-red focus:outline-none`}
-          title={t("nav.logout")}
+          className="group/item relative flex items-center justify-center lg:w-full text-grayishBlue transition-colors duration-200 hover:text-red focus:outline-none"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -158,16 +125,9 @@ function Navbar() {
             <polyline points="16 17 21 12 16 7" />
             <line x1="21" y1="12" x2="9" y2="12" />
           </svg>
-          <motion.span
-            className="text-xs font-medium whitespace-nowrap overflow-hidden"
-            animate={{
-              maxWidth: expanded ? 80 : 0,
-              opacity: expanded ? 1 : 0,
-            }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-          >
+          <span className="pointer-events-none absolute left-full top-1/2 z-[9999] ml-3 hidden -translate-y-1/2 whitespace-nowrap rounded-md bg-red px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity duration-200 before:absolute before:right-full before:top-1/2 before:-translate-y-1/2 before:border-4 before:border-transparent before:border-r-red group-hover/item:opacity-100 lg:block">
             {t("nav.logout")}
-          </motion.span>
+          </span>
         </button>
       </div>
     </nav>
