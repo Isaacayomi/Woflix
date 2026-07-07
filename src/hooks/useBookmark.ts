@@ -19,6 +19,7 @@ export function useBookmark(movie: Movie) {
     mutationFn: updateBookmark,
 
     onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["bookmarkedIds"] });
       queryClient.invalidateQueries({ queryKey: ["trendingMovies"] });
       queryClient.invalidateQueries({ queryKey: ["allMovies"] });
       queryClient.invalidateQueries({ queryKey: ["bookmarkedMovies"] });

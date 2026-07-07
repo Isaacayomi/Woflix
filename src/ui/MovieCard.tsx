@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useBookmark } from "../hooks/useBookmark";
+import { useBookmarkedIds } from "../hooks/useBookmarkedIds";
 import { usePrefetchDetail } from "../hooks/usePrefetchDetail";
 import type { MoviesProps } from "types";
 import Playicon from "./Playicon";
@@ -13,7 +14,9 @@ function MovieCard({ movie }: MoviesProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { prefetchVideos } = usePrefetchDetail();
-  const { bookmarked, isPending, handleClick } = useBookmark(movie);
+  const bookmarkedIds = useBookmarkedIds();
+  const movieWithStatus = { ...movie, isBookmarked: bookmarkedIds.has(movie.id) };
+  const { bookmarked, isPending, handleClick } = useBookmark(movieWithStatus);
   const { title, year, category, rating, thumbnail } = movie;
   const { regular } = thumbnail;
 

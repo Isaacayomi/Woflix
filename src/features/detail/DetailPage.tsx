@@ -3,6 +3,7 @@ import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import { useQueryClient } from "@tanstack/react-query";
 import { useDetail } from "../../hooks/useDetail";
 import { useVideos } from "../../hooks/useVideos";
 import { useCredits } from "../../hooks/useCredits";
@@ -102,6 +103,7 @@ function DetailPage() {
   const [watchEntry, setWatchEntry] = useState<{ progress: number } | null>(null);
   const [demoMode, setDemoMode] = useState(false);
   const [demoWatchEntry, setDemoWatchEntry] = useState<{ progress: number; resumeSeconds?: number } | null>(null);
+  const queryClient = useQueryClient();
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [bookmarkPending, setBookmarkPending] = useState(false);
   const [trailerReady, setTrailerReady] = useState(false);
@@ -114,9 +116,11 @@ function DetailPage() {
 
   useEffect(() => {
     if (!tmdbId) return;
-    getBookmark().then((items) => {
-      setIsBookmarked(items.some((item) => item.id === tmdbId));
-    });
+    getBookmark()
+      .then((items) => {
+        setIsBookmarked(items.some((item) => item.id === tmdbId));
+      })
+      .catch(() => setIsBookmarked(false));
   }, [tmdbId]);
 
   const toggleBookmark = async () => {
@@ -126,6 +130,8 @@ function DetailPage() {
     setIsBookmarked(newValue);
     try {
       await updateBookmark({ newValue, id: tmdbId });
+      queryClient.invalidateQueries({ queryKey: ["bookmarkedIds"] });
+      queryClient.invalidateQueries({ queryKey: ["bookmarkedMovies"] });
       toast.success(
         newValue
           ? `${title} has been added to bookmarks`
