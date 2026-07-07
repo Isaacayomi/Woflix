@@ -1,6 +1,6 @@
-import { motion, type Variants } from "framer-motion";
+import { motion } from "framer-motion";
 
-export const cardVariants: Variants = {
+export const cardVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0 },
 };
