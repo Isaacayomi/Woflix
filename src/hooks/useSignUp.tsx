@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { signUpApi } from "../services/apiAuth";
+import { trackUserCountry } from "../services/apiGeolocation";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
@@ -11,6 +12,7 @@ export function useSignUp() {
 
     onSuccess: () => {
       toast.success("Account created successfully");
+      trackUserCountry();
       navigate("/login");
     },
 

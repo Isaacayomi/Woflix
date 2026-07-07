@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { loginApi } from "../services/apiAuth";
+import { trackUserCountry } from "../services/apiGeolocation";
 import type { AuthProps } from "types";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -16,6 +17,7 @@ export function useLogin() {
       loginApi({ email, password }),
 
     onSuccess: () => {
+      trackUserCountry();
       navigate("/", { replace: true });
       toast.success("Logged in successfully");
     },
