@@ -141,6 +141,8 @@
     "remindMe": "Me rappeler",
     "continueWatching": "Continuer",
     "watchNow": "Regarder",
+    "watchDemo": "Voir la démo",
+    "demoQuality": "Démo",
     "share": "Partager",
     "watched": "Vu",
     "moreLikeThis": "Similaires",
@@ -180,7 +182,11 @@
   },
   "videoPlayer": {
     "close": "Fermer",
-    "retry": "Réessayer"
+    "retry": "Réessayer",
+    "settings": "Paramètres",
+    "speed": "Vitesse",
+    "pip": "Picture-in-Picture",
+    "failedToLoad": "Impossible de charger la vidéo. Réessayez."
   },
   "playIcon": {
     "play": "Lecture"

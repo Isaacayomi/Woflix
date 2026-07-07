@@ -62,6 +62,8 @@
   },
   "detail": {
     "watchNow": "今すぐ見る",
+    "watchDemo": "デモを見る",
+    "demoQuality": "デモ",
     "share": "共有",
     "topCast": "キャスト"
   },

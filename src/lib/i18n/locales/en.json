@@ -193,6 +193,8 @@
     "remindMe": "Remind Me",
     "continueWatching": "Continue Watching",
     "watchNow": "Watch Now",
+    "watchDemo": "Watch Demo",
+    "demoQuality": "Demo",
     "linkCopied": "Link copied to clipboard",
     "share": "Share",
     "markedWatched": "Marked as watched",
@@ -203,7 +205,9 @@
     "topCast": "Top Cast",
     "clearRating": "Clear",
     "episodePrefix": "Ep.",
-    "seasonPrefix": "Season"
+    "seasonPrefix": "Season",
+    "bookmark": "Bookmark",
+    "bookmarked": "Bookmarked"
   },
   "history": {
     "heading": "Watch History",
@@ -247,13 +251,11 @@
   },
   "videoPlayer": {
     "close": "Close",
-    "switchProvider": "Switch provider",
-    "switch": "Switch",
-    "failedToLoad": "Failed to load from ",
     "retry": "Retry",
-    "tryProvider": "Try {{name}}",
-    "providerVidSrc": "VidSrc",
-    "provider2Embed": "2Embed"
+    "settings": "Settings",
+    "speed": "Speed",
+    "pip": "Picture-in-Picture",
+    "failedToLoad": "Could not load the video. Try again."
   },
   "playIcon": {
     "play": "Play"

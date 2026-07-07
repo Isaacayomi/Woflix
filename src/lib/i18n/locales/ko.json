@@ -62,6 +62,8 @@
   },
   "detail": {
     "watchNow": "지금 시청",
+    "watchDemo": "데모 보기",
+    "demoQuality": "데모",
     "share": "공유",
     "topCast": "출연진"
   },

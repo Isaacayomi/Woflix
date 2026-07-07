@@ -62,6 +62,8 @@
   },
   "detail": {
     "watchNow": "Guarda ora",
+    "watchDemo": "Guarda la demo",
+    "demoQuality": "Demo",
     "share": "Condividi",
     "topCast": "Cast"
   },

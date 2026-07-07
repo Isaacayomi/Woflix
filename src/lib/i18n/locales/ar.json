@@ -62,6 +62,8 @@
   },
   "detail": {
     "watchNow": "شاهد الآن",
+    "watchDemo": "شاهد العرض التوضيحي",
+    "demoQuality": "عرض توضيحي",
     "share": "مشاركة",
     "topCast": "طاقم التمثيل"
   },

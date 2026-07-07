@@ -62,6 +62,8 @@
   },
   "detail": {
     "watchNow": "Смотреть сейчас",
+    "watchDemo": "Смотреть демо",
+    "demoQuality": "Демо",
     "share": "Поделиться",
     "topCast": "Актёры"
   },

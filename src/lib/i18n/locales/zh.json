@@ -62,6 +62,8 @@
   },
   "detail": {
     "watchNow": "立即观看",
+    "watchDemo": "观看演示",
+    "demoQuality": "演示",
     "share": "分享",
     "topCast": "主演"
   },
