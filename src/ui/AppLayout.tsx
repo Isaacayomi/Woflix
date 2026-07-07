@@ -33,13 +33,13 @@ function AppLayout() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-darkBlue font-outfit text-white">
-        <div className="mx-auto flex max-w-[1500px] gap-9 p-8 pb-20 lg:pb-8">
+      <div className="h-screen overflow-hidden bg-darkBlue font-outfit text-white">
+        <div className="mx-auto flex h-full max-w-[1500px] gap-9 p-8 pb-20 lg:pb-8">
           <Navbar />
 
-          <div className="flex min-w-0 flex-1 flex-col gap-9">
+          <div className="flex min-w-0 flex-1 flex-col gap-9 min-h-0">
             {!isDetailRoute && (
-              <header className="sticky top-0 z-10 flex flex-col gap-4 bg-darkBlue lg:flex-row lg:items-center lg:gap-8">
+              <header className="flex flex-col gap-4 shrink-0 lg:flex-row lg:items-center lg:gap-8">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     {!isHome && (
@@ -119,7 +119,7 @@ function AppLayout() {
 
             <main
               ref={mainRef}
-              className=""
+              className="flex-1 overflow-y-auto min-h-0 bg-darkBlue [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             >
               <AnimatePresence mode="wait">
                 <motion.div
