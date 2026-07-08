@@ -129,7 +129,7 @@ function DetailPage() {
     const newValue = !isBookmarked;
     setIsBookmarked(newValue);
     try {
-      await updateBookmark({ newValue, id: tmdbId });
+      await updateBookmark({ newValue, id: tmdbId, mediaType });
       queryClient.invalidateQueries({ queryKey: ["bookmarkedIds"] });
       queryClient.invalidateQueries({ queryKey: ["bookmarkedMovies"] });
       toast.success(
@@ -231,7 +231,7 @@ function DetailPage() {
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <div className="fixed inset-0 z-10 h-screen bg-darkBlue">
+      <div className="sticky top-0 z-10 h-screen overflow-hidden bg-darkBlue">
         <img
           src={backdropImage}
           alt={title}
@@ -577,50 +577,50 @@ function DetailPage() {
         </div>
       </div>
 
-      <div className="h-screen" />
+      <div className="relative z-20">
+        <div className="mx-auto max-w-6xl">
+          {/* Episode Guide */}
+          {mediaType === "tv" && (
+            <section className="bg-darkBlue px-6 pb-8 pt-6 md:px-12">
+              <h2 className="mb-4 text-xl font-semibold">
+                {t("detail.episodesHeading", { season })}
+              </h2>
+              <EpisodeList
+                seriesId={tmdbId}
+                seasonNumber={season}
+                onSelectEpisode={handleSelectEpisode}
+              />
+            </section>
+          )}
 
-      <div className="relative z-20 bg-darkBlue">
-        {/* Episode Guide */}
-        {mediaType === "tv" && (
-          <section className="px-6 pb-8 pt-6 md:px-12">
-            <h2 className="mb-4 text-xl font-semibold">
-              {t("detail.episodesHeading", { season })}
-            </h2>
-            <EpisodeList
-              seriesId={tmdbId}
-              seasonNumber={season}
-              onSelectEpisode={handleSelectEpisode}
-            />
-          </section>
-        )}
+          {/* Similar */}
+          {similar.length > 0 && (
+            <section className="bg-darkBlue px-6 pb-8 md:px-12">
+              <h2 className="mb-4 text-xl font-semibold">{t("detail.moreLikeThis")}</h2>
+              <StaggerContainer className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+                {similar.map((m) => (
+                  <motion.div key={m.id} variants={cardVariants}>
+                    <MovieCard movie={m} />
+                  </motion.div>
+                ))}
+              </StaggerContainer>
+            </section>
+          )}
 
-        {/* Similar */}
-        {similar.length > 0 && (
-          <section className="px-6 pb-8 md:px-12">
-            <h2 className="mb-4 text-xl font-semibold">{t("detail.moreLikeThis")}</h2>
-            <StaggerContainer className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-              {similar.map((m) => (
-                <motion.div key={m.id} variants={cardVariants}>
-                  <MovieCard movie={m} />
-                </motion.div>
-              ))}
-            </StaggerContainer>
-          </section>
-        )}
-
-        {/* Recommendations */}
-        {recommendations.length > 0 && (
-          <section className="px-6 pb-12 md:px-12">
-            <h2 className="mb-4 text-xl font-semibold">{t("detail.recommendations")}</h2>
-            <StaggerContainer className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-              {recommendations.map((m) => (
-                <motion.div key={m.id} variants={cardVariants}>
-                  <MovieCard movie={m} />
-                </motion.div>
-              ))}
-            </StaggerContainer>
-          </section>
-        )}
+          {/* Recommendations */}
+          {recommendations.length > 0 && (
+            <section className="bg-darkBlue px-6 pb-12 md:px-12">
+              <h2 className="mb-4 text-xl font-semibold">{t("detail.recommendations")}</h2>
+              <StaggerContainer className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+                {recommendations.map((m) => (
+                  <motion.div key={m.id} variants={cardVariants}>
+                    <MovieCard movie={m} />
+                  </motion.div>
+                ))}
+              </StaggerContainer>
+            </section>
+          )}
+        </div>
       </div>
 
       {/* Sound toggle */}
