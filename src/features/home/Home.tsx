@@ -52,7 +52,7 @@ function Home() {
     .slice(0, 6);
 
   return (
-    <div className="h-screen">
+    <div className="min-h-full">
       {!query && (
         <>
           {heroPending ? (

@@ -25,76 +25,45 @@ function AppLayout() {
   const isCategoriesLanding = pathname === "/categories";
 
   useEffect(() => {
-    mainRef.current?.scrollTo(0, 0);
-    window.scrollTo(0, 0);
-  }, [pathname]);
+    if (isDetailRoute) {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    } else {
+      mainRef.current?.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    }
+  }, [pathname, isDetailRoute]);
 
   const { logout, isPending: logoutPending } = useLogout();
 
+  if (isDetailRoute) {
+    return (
+      <ProtectedRoute>
+        <div className="min-h-screen bg-darkBlue font-outfit text-white">
+          <Outlet />
+        </div>
+      </ProtectedRoute>
+    );
+  }
+
   return (
     <ProtectedRoute>
-      <div className="h-screen overflow-hidden bg-darkBlue font-outfit text-white">
+      <div className="h-[100dvh] overflow-hidden bg-darkBlue font-outfit text-white">
         <div className="mx-auto flex h-full max-w-[1500px] gap-9 p-8 pb-20 lg:pb-8">
           <Navbar />
 
-          <div className="flex min-w-0 flex-1 flex-col gap-9 min-h-0">
-            {!isDetailRoute && (
-              <header className="flex flex-col gap-4 shrink-0 lg:flex-row lg:items-center lg:gap-8">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    {!isHome && (
-                      <button
-                        onClick={() => navigate(-1)}
-                        className="shrink-0 text-white/60 transition-colors hover:text-white"
-                        aria-label={t("appLayout.back")}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <polyline points="15 18 9 12 15 6" />
-                        </svg>
-                      </button>
-                    )}
-                    <Link
-                      to="/"
-                      className="shrink-0 text-3xl font-black tracking-[0.08em] text-red transition-colors duration-200 hover:text-red/80 sm:text-4xl"
-                      aria-label={t("appLayout.homeLink")}
-                    >
-                      WòFlix
-                    </Link>
-                  </div>
-
-                  <div className="flex items-center gap-3 lg:hidden">
-                    <NavLink
-                      to="/profile"
-                      className="h-8 w-8 overflow-hidden rounded-full border border-white/50"
-                    >
-                      <img
-                        src={
-                          auth.currentUser?.photoURL ||
-                          "/assets/image-avatar.png"
-                        }
-                        alt=""
-                        className="h-full w-full object-cover"
-                      />
-                    </NavLink>
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-9">
+            <header className="sticky top-0 z-10 flex flex-col gap-4 bg-darkBlue lg:flex-row lg:items-center lg:gap-8">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  {!isHome && (
                     <button
-                      onClick={() => logout()}
-                      disabled={logoutPending}
-                      className="text-white/60 transition-colors hover:text-red"
+                      onClick={() => navigate(-1)}
+                      className="shrink-0 text-white/60 transition-colors hover:text-white"
+                      aria-label={t("appLayout.back")}
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        width="20"
-                        height="20"
+                        width="24"
+                        height="24"
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
@@ -102,31 +71,73 @@ function AppLayout() {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       >
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                        <polyline points="16 17 21 12 16 7" />
-                        <line x1="21" y1="12" x2="9" y2="12" />
+                        <polyline points="15 18 9 12 15 6" />
                       </svg>
                     </button>
-                  </div>
+                  )}
+                  <Link
+                    to="/"
+                    className="shrink-0 text-3xl font-black tracking-[0.08em] text-red transition-colors duration-200 hover:text-red/80 sm:text-4xl"
+                    aria-label={t("appLayout.homeLink")}
+                  >
+                    WòFlix
+                  </Link>
                 </div>
-                {!isCategoriesLanding && (
-                  <div className="min-w-0 flex-1">
-                    <Search />
-                  </div>
-                )}
-              </header>
-            )}
+
+                <div className="flex items-center gap-3 lg:hidden">
+                  <NavLink
+                    to="/profile"
+                    className="h-8 w-8 overflow-hidden rounded-full border border-white/50"
+                  >
+                    <img
+                      src={
+                        auth.currentUser?.photoURL ||
+                        "/assets/image-avatar.png"
+                      }
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
+                  </NavLink>
+                  <button
+                    onClick={() => logout()}
+                    disabled={logoutPending}
+                    className="text-white/60 transition-colors hover:text-red"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                      <polyline points="16 17 21 12 16 7" />
+                      <line x1="21" y1="12" x2="9" y2="12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              {!isCategoriesLanding && (
+                <div className="min-w-0 flex-1">
+                  <Search />
+                </div>
+              )}
+            </header>
 
             <main
               ref={mainRef}
-              className="flex-1 overflow-y-auto min-h-0 bg-darkBlue [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              className="min-h-0 flex-1 overflow-y-auto bg-darkBlue"
             >
               <AnimatePresence mode="wait">
                 <motion.div
                   key={pathname}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
                   transition={{ duration: 0.25 }}
                 >
                   <Outlet />

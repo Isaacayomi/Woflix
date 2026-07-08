@@ -17,7 +17,7 @@ function Bookmark() {
   const query = searchParams.get("q") || "";
   const [tab, setTab] = useState<Tab>("all");
 
-  const { data: isBookmarked, isPending } = useQuery({
+  const { data: isBookmarked, isPending, isError } = useQuery({
     queryKey: ["bookmarkedMovies"],
     queryFn: getBookmark,
   });
@@ -39,9 +39,23 @@ function Bookmark() {
 
   if (isPending) return <Spinner />;
 
+  if (isError) {
+    return (
+      <div className="min-h-full">
+        <Heading>{t("bookmarks.heading")}</Heading>
+        <div className="mt-16 flex flex-col items-center gap-4 text-center">
+          <p className="text-lg text-grayishBlue">{t("bookmarks.errorTitle")}</p>
+          <p className="text-sm text-grayishBlue/60">
+            {t("bookmarks.errorDesc")}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   if (allBookmarked.length === 0 && !query) {
     return (
-      <div className="h-screen">
+      <div className="min-h-full">
         <Heading>{t("bookmarks.heading")}</Heading>
         <div className="mt-16 flex flex-col items-center gap-4 text-center">
           <img
@@ -59,7 +73,7 @@ function Bookmark() {
   }
 
   return (
-    <div className="h-screen">
+    <div className="min-h-full">
       {!query ? (
         <Heading>{t("bookmarks.heading")}</Heading>
       ) : (

@@ -20,7 +20,7 @@ function History() {
   };
 
   return (
-    <div className="h-screen">
+    <div className="min-h-full">
       <Heading>{t("history.heading")}</Heading>
 
       {isPending && <Spinner />}
