@@ -6,6 +6,7 @@ import type { Movie } from "types";
 
 export function useBookmark(movie: Movie) {
   const { title, isBookmarked, id } = movie;
+  const mediaType = movie.category === "movie" ? "movie" : "tv";
 
   const [bookmarked, setBookmarked] = useState<boolean>(isBookmarked);
 
@@ -42,7 +43,7 @@ export function useBookmark(movie: Movie) {
     const newValue = !bookmarked;
     setBookmarked(newValue);
 
-    mutate({ newValue, id });
+    mutate({ newValue, id, mediaType });
   }
 
   return { bookmarked, isPending, handleClick };

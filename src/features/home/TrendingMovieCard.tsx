@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { Movie } from "types";
 import { useBookmark } from "../../hooks/useBookmark";
+import { useBookmarkedIds } from "../../hooks/useBookmarkedIds";
 import { usePrefetchDetail } from "../../hooks/usePrefetchDetail";
 import SpinnerMini from "../../ui/SpinnerMini";
 import Playicon from "../../ui/Playicon";
@@ -15,7 +16,9 @@ function TrendingMovieCard({ movie, index }: TrendingMovieCardProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { prefetchVideos } = usePrefetchDetail();
-  const { bookmarked, handleClick, isPending } = useBookmark(movie);
+  const bookmarkedIds = useBookmarkedIds();
+  const movieWithStatus = { ...movie, isBookmarked: bookmarkedIds.has(movie.id) };
+  const { bookmarked, handleClick, isPending } = useBookmark(movieWithStatus);
 
   const mediaType = movie.category === "tv series" ? "tv" : "movie";
   const route = mediaType === "tv" ? `/tv/${movie.id}` : `/movie/${movie.id}`;

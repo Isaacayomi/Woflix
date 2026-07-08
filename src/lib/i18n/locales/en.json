@@ -63,7 +63,9 @@
     "emptyFilter": "No bookmarked {{type}} found",
     "emptyFilterMovie": "movies",
     "emptyFilterSeries": "series",
-    "emptyFilterAll": "items"
+    "emptyFilterAll": "items",
+    "errorTitle": "Something went wrong",
+    "errorDesc": "Failed to load bookmarks. Please try again later."
   },
   "categories": {
     "heading": "Browse",

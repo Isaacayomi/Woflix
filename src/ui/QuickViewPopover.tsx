@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useMoviePreview } from "../hooks/useMoviePreview";
 import { useCertification } from "../hooks/useCertification";
 import { useBookmark } from "../hooks/useBookmark";
+import { useBookmarkedIds } from "../hooks/useBookmarkedIds";
 import { usePrefetchDetail } from "../hooks/usePrefetchDetail";
 import type { Movie } from "types";
 import SpinnerMini from "./SpinnerMini";
@@ -14,7 +15,9 @@ function QuickViewPopover({ movie, inline = false }: { movie: Movie; inline?: bo
   const { prefetchVideos } = usePrefetchDetail();
   const { data: detail, isPending } = useMoviePreview(movie.id, movie.category);
   const { certification } = useCertification(movie.id);
-  const { bookmarked, isPending: bmPending, handleClick } = useBookmark(movie);
+  const bookmarkedIds = useBookmarkedIds();
+  const movieWithStatus = { ...movie, isBookmarked: bookmarkedIds.has(movie.id) };
+  const { bookmarked, isPending: bmPending, handleClick } = useBookmark(movieWithStatus);
 
   const mediaType = movie.category === "tv series" ? "tv" : "movie";
   const route =
