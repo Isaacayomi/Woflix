@@ -7,3 +7,13 @@
   --plyr-video-background: #10141e;
   --plyr-menu-background: #161d2f;
 }
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}

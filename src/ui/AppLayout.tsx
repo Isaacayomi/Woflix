@@ -130,7 +130,7 @@ function AppLayout() {
 
             <main
               ref={mainRef}
-              className="min-h-0 flex-1 overflow-y-auto bg-darkBlue"
+              className="min-h-0 flex-1 overflow-y-auto scrollbar-hide bg-darkBlue"
             >
               <AnimatePresence mode="wait">
                 <motion.div
