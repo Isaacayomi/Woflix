@@ -53,7 +53,7 @@ function ContinueWatchingCard({ entry }: Props) {
         backgroundImage: `url(${imageUrl(entry.backdropPath, "w780")})`,
         zIndex: isHovered ? 50 : 1,
       }}
-      animate={{ scale: isHovered ? 1.1 : 1 }}
+      animate={{ scale: isHovered ? 1.05 : 1 }}
       transition={{
         scale: {
           type: "spring",
