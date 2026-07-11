@@ -47,12 +47,12 @@ function AppLayout() {
   return (
     <ProtectedRoute>
       <div className="h-[100dvh] overflow-hidden bg-darkBlue font-outfit text-white">
-        <div className="mx-auto flex h-full max-w-[1500px] gap-9 p-8 pb-20 lg:pb-8">
+        <div className="flex h-full gap-9 px-4 pb-20 lg:px-0 lg:pb-8">
           <Navbar />
 
-          <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-9">
-            <header className="sticky top-0 z-10 flex flex-col gap-4 bg-darkBlue lg:flex-row lg:items-center lg:gap-8">
-              <div className="flex items-center justify-between">
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-9 pt-8">
+            <header className="sticky top-0 z-10 flex flex-col gap-4 bg-darkBlue md:flex-row md:items-center md:justify-between md:gap-4 lg:gap-8">
+              <div className="flex items-center justify-between md:justify-start md:gap-4">
                 <div className="flex items-center gap-4">
                   {!isHome && (
                     <button
@@ -84,7 +84,7 @@ function AppLayout() {
                   </Link>
                 </div>
 
-                <div className="flex items-center gap-3 lg:hidden">
+                <div className="flex items-center gap-3 md:hidden">
                   <NavLink
                     to="/profile"
                     className="h-8 w-8 overflow-hidden rounded-full border border-white/50"
@@ -121,11 +121,50 @@ function AppLayout() {
                   </button>
                 </div>
               </div>
-              {!isCategoriesLanding && (
-                <div className="min-w-0 flex-1">
-                  <Search />
+
+              <div className="flex min-w-0 items-center justify-center gap-4 md:justify-end">
+                {!isCategoriesLanding && (
+                  <div className="min-w-0 w-full max-w-md lg:max-w-lg">
+                    <Search />
+                  </div>
+                )}
+                <div className="hidden items-center gap-5 md:flex lg:hidden">
+                  <NavLink
+                    to="/profile"
+                    className="h-8 w-8 overflow-hidden rounded-full border border-white/50"
+                  >
+                    <img
+                      src={
+                        auth.currentUser?.photoURL ||
+                        "/assets/image-avatar.png"
+                      }
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
+                  </NavLink>
+                  <button
+                    onClick={() => logout()}
+                    disabled={logoutPending}
+                    className="text-white/60 transition-colors hover:text-red"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                      <polyline points="16 17 21 12 16 7" />
+                      <line x1="21" y1="12" x2="9" y2="12" />
+                    </svg>
+                  </button>
                 </div>
-              )}
+              </div>
             </header>
 
             <main
