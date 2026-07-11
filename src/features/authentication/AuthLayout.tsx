@@ -1,7 +1,8 @@
 import { useTrendingMovies } from "../../hooks/useTrendingMovie";
 import { useTranslation } from "react-i18next";
+import type { Movie } from "../../types";
 
-function getImg(movie: any): string {
+function getImg(movie: Movie): string {
   return movie.thumbnail?.regular?.small ||
     movie.thumbnail?.regular?.medium ||
     movie.thumbnail?.trending?.small ||
@@ -13,7 +14,7 @@ function PosterColumns({
   movies,
   isPending,
 }: {
-  movies: any[];
+  movies: Movie[];
   isPending: boolean;
 }) {
   const leftCol = movies.filter((_, i) => i % 2 === 0);
@@ -29,7 +30,7 @@ function PosterColumns({
     </div>
   );
 
-  const column = (items: any[], dir: "up" | "down") => (
+  const column = (items: Movie[], dir: "up" | "down") => (
     <div className="flex-1 overflow-hidden">
       <div
         className={`flex flex-col gap-2 ${dir === "up" ? "animate-scroll-up" : "animate-scroll-down"}`}
