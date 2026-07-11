@@ -10,7 +10,7 @@ import Playicon from "./Playicon";
 import SpinnerMini from "./SpinnerMini";
 import QuickViewPopover from "./QuickViewPopover";
 
-function MovieCard({ movie }: MoviesProps) {
+function MovieCard({ movie, showPopover = true }: MoviesProps & { showPopover?: boolean }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { prefetchVideos } = usePrefetchDetail();
@@ -50,15 +50,7 @@ function MovieCard({ movie }: MoviesProps) {
 
   return (
     <motion.div
-      className="relative mb-4 origin-left"
-      animate={{ scale: isHovered ? 1.1 : 1 }}
-      transition={{
-        scale: {
-          type: "spring",
-          stiffness: 300,
-          damping: 25,
-        },
-      }}
+      className="relative mb-4"
       style={{ zIndex: isHovered ? 50 : 1 }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -148,20 +140,22 @@ function MovieCard({ movie }: MoviesProps) {
         </div>
       </div>
 
-      <AnimatePresence>
-        {isHovered && (
-          <motion.div
-            className="absolute left-0 right-0 z-50 pt-2"
-            style={{ top: "100%" }}
-            initial={{ opacity: 0, y: -6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <QuickViewPopover movie={movie} inline />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {showPopover && (
+        <AnimatePresence>
+          {isHovered && (
+            <motion.div
+              className="absolute left-0 right-0 z-50 pt-2"
+              style={{ top: "100%" }}
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <QuickViewPopover movie={movie} inline />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      )}
     </motion.div>
   );
 }

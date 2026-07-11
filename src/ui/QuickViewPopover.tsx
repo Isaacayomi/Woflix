@@ -9,7 +9,7 @@ import { usePrefetchDetail } from "../hooks/usePrefetchDetail";
 import type { Movie } from "types";
 import SpinnerMini from "./SpinnerMini";
 
-function QuickViewPopover({ movie, inline = false }: { movie: Movie; inline?: boolean }) {
+function QuickViewPopover({ movie, inline = false, containerRect }: { movie: Movie; inline?: boolean; containerRect?: DOMRect }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { prefetchVideos } = usePrefetchDetail();
@@ -31,6 +31,75 @@ function QuickViewPopover({ movie, inline = false }: { movie: Movie; inline?: bo
     navigate(route);
   };
 
+  if (containerRect) {
+    const popoverWidth = 320;
+    const gap = 8;
+    let top = containerRect.bottom + gap;
+    let left = containerRect.left + containerRect.width / 2 - popoverWidth / 2;
+    left = Math.max(8, Math.min(left, window.innerWidth - popoverWidth - 8));
+    if (top + 400 > window.innerHeight) {
+      top = containerRect.top - gap;
+    }
+
+    return (
+      <div
+        className="z-[9999] w-[320px] flex flex-col rounded-lg bg-darkBlue p-3 shadow-2xl"
+        style={{ position: "fixed", top, left }}
+        onClick={() => goToDetail()}
+      >
+        <div className="flex items-center gap-2 text-xs text-white/70">
+          <span className="rounded bg-yellow-500 px-1.5 py-0.5 font-bold text-black">
+            {movie.rating}
+          </span>
+          <span>{movie.year}</span>
+          {certification && (
+            <span className="rounded border border-white/20 px-1 py-0.5 text-[10px] font-semibold uppercase">
+              {certification}
+            </span>
+          )}
+          <span className="capitalize">{movie.category}</span>
+        </div>
+
+        {isPending ? (
+          <div className="mt-2 flex gap-1.5">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-5 w-16 animate-pulse rounded-full bg-semiDarkBlue" />
+            ))}
+          </div>
+        ) : (
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {(detail?.genres ?? []).slice(0, 3).map((g) => (
+              <span key={g.id} className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-white/70">
+                {g.name}
+              </span>
+            ))}
+          </div>
+        )}
+
+        <p className="mt-2 text-[11px] leading-relaxed text-white/60 line-clamp-2">
+          {isPending ? (
+            <>
+              <span className="inline-block h-3 w-full animate-pulse rounded bg-semiDarkBlue" />
+              <span className="mt-1 inline-block h-3 w-3/4 animate-pulse rounded bg-semiDarkBlue" />
+            </>
+          ) : (
+            detail?.overview ?? "No overview available."
+          )}
+        </p>
+
+        <button
+          onClick={(e) => goToDetail(e)}
+          className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-md bg-red py-1.5 text-xs font-medium hover:bg-red/80"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+          {t("quickView.watchNow")}
+        </button>
+      </div>
+    );
+  }
+
   if (inline) {
     const containerVariants = {
       hidden: { opacity: 0 },
@@ -45,12 +114,12 @@ function QuickViewPopover({ movie, inline = false }: { movie: Movie; inline?: bo
       visible: { opacity: 1, y: 0, transition: { duration: 0.25 } },
     };
 
-    return (
+  return (
       <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="flex flex-col gap-2 rounded-lg bg-darkBlue p-3 shadow-2xl"
+        className="flex w-full flex-col gap-2 rounded-lg bg-darkBlue p-3 shadow-2xl"
         onClick={() => goToDetail()}
       >
         {/* Rating, year, certification, category */}
