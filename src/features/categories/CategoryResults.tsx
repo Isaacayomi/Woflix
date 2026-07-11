@@ -64,7 +64,7 @@ function CategoryResults() {
       <StaggerContainer className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {movies.map((movie) => (
           <motion.div key={movie.id} variants={cardVariants}>
-            <MovieCard movie={movie} />
+            <MovieCard movie={movie} showPopover={false} />
           </motion.div>
         ))}
       </StaggerContainer>

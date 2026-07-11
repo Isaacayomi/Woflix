@@ -44,18 +44,18 @@ const DECADES = [
 ];
 
 const GRADIENTS = [
-  "from-red-600 to-red-900",
-  "from-blue-600 to-blue-900",
-  "from-emerald-600 to-emerald-900",
-  "from-purple-600 to-purple-900",
-  "from-orange-600 to-orange-900",
-  "from-pink-600 to-pink-900",
-  "from-teal-600 to-teal-900",
-  "from-amber-600 to-amber-900",
-  "from-indigo-600 to-indigo-900",
-  "from-rose-600 to-rose-900",
-  "from-cyan-600 to-cyan-900",
-  "from-lime-600 to-lime-900",
+  "from-fuchsia-600 to-fuchsia-700",
+  "from-blue-600 to-blue-700",
+  "from-emerald-600 to-emerald-700",
+  "from-purple-600 to-purple-700",
+  "from-orange-600 to-orange-700",
+  "from-pink-600 to-pink-700",
+  "from-teal-600 to-teal-700",
+  "from-amber-600 to-amber-700",
+  "from-indigo-600 to-indigo-700",
+  "from-rose-600 to-rose-700",
+  "from-cyan-600 to-cyan-700",
+  "from-lime-600 to-lime-700",
 ];
 
 function CategoriesPage() {
