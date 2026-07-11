@@ -23,7 +23,7 @@ export function useLogin() {
     },
 
     onError: (err) => {
-      toast.error(err.message || "Login failed, please try again");
+      toast.error("Invalid email or password. Please try again.");
     },
   });
 

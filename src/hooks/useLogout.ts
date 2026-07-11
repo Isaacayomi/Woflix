@@ -15,7 +15,7 @@ export function useLogout() {
     },
 
     onError: (err: Error) => {
-      toast.error(`Logout failed: ${err.message}`);
+      toast.error("Couldn't log out. Try again.");
     },
   });
 
