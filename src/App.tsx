@@ -1,27 +1,30 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Home from "./features/home/Home";
-import Movies from "./features/movies/Movies";
-import Series from "./features/series/Series";
-import Bookmark from "./features/bookmarks/Bookmark";
-import CategoriesPage from "./features/categories/CategoriesPage";
-import CategoryResults from "./features/categories/CategoryResults";
-import DecadeResults from "./features/browse/DecadeResults";
-import LanguageResults from "./features/browse/LanguageResults";
-import PlatformResults from "./features/platforms/PlatformResults";
-import CollectionPage from "./features/collection/CollectionPage";
-import DetailPage from "./features/detail/DetailPage";
+import { lazy, Suspense } from "react";
 import AppLayout from "./ui/AppLayout";
+import Spinner from "./ui/Spinner";
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import PageNotFound from "./ui/PageNotFound";
-import Login from "./features/authentication/Login";
-import SignUp from "./features/authentication/SignUp";
-import Profile from "./features/profile/Profile";
-import History from "./features/history/History";
-import Admin from "./features/admin/Admin";
 import { Toaster } from "react-hot-toast";
 import { useEffect } from "react";
 import i18n from "./lib/i18n/config";
+
+const Home = lazy(() => import("./features/home/Home"));
+const Movies = lazy(() => import("./features/movies/Movies"));
+const Series = lazy(() => import("./features/series/Series"));
+const Bookmark = lazy(() => import("./features/bookmarks/Bookmark"));
+const CategoriesPage = lazy(() => import("./features/categories/CategoriesPage"));
+const CategoryResults = lazy(() => import("./features/categories/CategoryResults"));
+const DecadeResults = lazy(() => import("./features/browse/DecadeResults"));
+const LanguageResults = lazy(() => import("./features/browse/LanguageResults"));
+const PlatformResults = lazy(() => import("./features/platforms/PlatformResults"));
+const CollectionPage = lazy(() => import("./features/collection/CollectionPage"));
+const DetailPage = lazy(() => import("./features/detail/DetailPage"));
+const History = lazy(() => import("./features/history/History"));
+const Profile = lazy(() => import("./features/profile/Profile"));
+const Admin = lazy(() => import("./features/admin/Admin"));
+const Login = lazy(() => import("./features/authentication/Login"));
+const SignUp = lazy(() => import("./features/authentication/SignUp"));
+const PageNotFound = lazy(() => import("./ui/PageNotFound"));
 
 function LanguageChangeHandler() {
   const queryClient = useQueryClient();
@@ -63,6 +66,7 @@ function App() {
       <BrowserRouter>
         <Toaster position="top-center" reverseOrder={false} />
         <LanguageChangeHandler />
+        <Suspense fallback={<Spinner />}>
         <Routes>
           <Route element={<AppLayout />}>
             <Route element={<Home />} path="/" />
@@ -85,6 +89,7 @@ function App() {
           <Route element={<SignUp />} path="sign-up" />
           <Route element={<PageNotFound />} path="*" />
         </Routes>
+        </Suspense>
       </BrowserRouter>
     </QueryClientProvider>
   );

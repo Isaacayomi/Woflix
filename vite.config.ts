@@ -3,6 +3,19 @@ import react from "@vitejs/plugin-react-swc";
 import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          "react-vendor": ["react", "react-dom", "react-router-dom"],
+          "framer-motion": ["framer-motion"],
+          swiper: ["swiper"],
+          firebase: ["firebase/app", "firebase/auth", "firebase/firestore"],
+          "tanstack-query": ["@tanstack/react-query"],
+        },
+      },
+    },
+  },
   server: {
     proxy: {
       "/api": {
