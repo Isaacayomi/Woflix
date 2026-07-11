@@ -17,11 +17,11 @@
     "brand": "WòFlix"
   },
   "search": {
-    "allPlaceholder": "Search for movies or TV series",
+    "allPlaceholder": "Search titles",
     "moviesPlaceholder": "Search for movies",
     "seriesPlaceholder": "Search for TV series",
     "browsePlaceholder": "Search for Movies/Shows",
-    "bookmarksPlaceholder": "Search for Bookmarked Shows",
+    "bookmarksPlaceholder": "Search for Bookmarked",
     "iconAlt": "Search icon"
   },
   "home": {
@@ -191,8 +191,6 @@
     "partOf": "Part of ",
     "yourRating": "Your Rating",
     "comingSoon": "Coming Soon",
-    "reminded": "Reminded",
-    "remindMe": "Remind Me",
     "continueWatching": "Continue Watching",
     "watchNow": "Watch Now",
     "watchDemo": "Watch Demo",
@@ -253,11 +251,13 @@
   },
   "videoPlayer": {
     "close": "Close",
+    "pause": "Pause",
     "retry": "Retry",
     "settings": "Settings",
     "speed": "Speed",
     "pip": "Picture-in-Picture",
-    "failedToLoad": "Could not load the video. Try again."
+    "failedToLoad": "Could not load the video. Try again.",
+    "tapToPlay": "Tap to play"
   },
   "playIcon": {
     "play": "Play"

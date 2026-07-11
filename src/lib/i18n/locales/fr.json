@@ -137,8 +137,6 @@
     "notFound": "Contenu introuvable",
     "back": "Retour",
     "comingSoon": "À venir",
-    "reminded": "Rappel activé",
-    "remindMe": "Me rappeler",
     "continueWatching": "Continuer",
     "watchNow": "Regarder",
     "watchDemo": "Voir la démo",
@@ -182,11 +180,13 @@
   },
   "videoPlayer": {
     "close": "Fermer",
+    "pause": "Pause",
     "retry": "Réessayer",
     "settings": "Paramètres",
     "speed": "Vitesse",
     "pip": "Picture-in-Picture",
-    "failedToLoad": "Impossible de charger la vidéo. Réessayez."
+    "failedToLoad": "Impossible de charger la vidéo. Réessayez.",
+    "tapToPlay": "Appuyez pour lire"
   },
   "playIcon": {
     "play": "Lecture"
