@@ -302,13 +302,13 @@ function Profile() {
                 className="h-full w-full object-cover"
               />
             </div>
-            <div className="min-w-0 flex-1">
+            <div className="min-w-0 flex-1 overflow-hidden">
               <div className="flex items-center gap-2">
                 <input
                   type="text"
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
-                  className="flex-1 rounded-lg bg-white/10 px-3 py-2 text-lg font-semibold text-white outline-none focus:ring-2 focus:ring-red"
+                  className="min-w-0 flex-1 rounded-lg bg-white/10 px-3 py-2 text-lg font-semibold text-white outline-none focus:ring-2 focus:ring-red"
                   placeholder="Your name"
                 />
                 <button
@@ -336,8 +336,8 @@ function Profile() {
                 </button>
               </div>
 
-              <div className="mt-2 flex items-center gap-2 text-sm text-grayishBlue">
-                <span>{user.email}</span>
+              <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-grayishBlue">
+                <span className="truncate">{user.email}</span>
                 {user.emailVerified || verified ? (
                   <span className="flex items-center gap-1 text-emerald-400">
                     <svg
