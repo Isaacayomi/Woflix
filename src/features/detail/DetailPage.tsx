@@ -14,11 +14,6 @@ import { isUnreleased } from "../../lib/releaseStatus";
 import { updateWatchProgress } from "../../services/apiWatchHistory";
 import { updateBookmark } from "../../services/apiUpdateBookmark";
 import { getBookmark } from "../../services/apiBookmark";
-import {
-  getReminder,
-  setReminder,
-  removeReminder,
-} from "../../services/apiReminders";
 import { useCertification } from "../../hooks/useCertification";
 import { useRecentlyViewed } from "../../hooks/useRecentlyViewed";
 import { useRating } from "../../hooks/useRating";
@@ -98,8 +93,7 @@ function DetailPage() {
   );
   const [muted, setMuted] = useState(false);
   const trailerIframeRef = useRef<HTMLIFrameElement>(null);
-  const [isReminded, setIsReminded] = useState(false);
-  const [isLoadingReminder, setIsLoadingReminder] = useState(false);
+
   const [watchEntry, setWatchEntry] = useState<{ progress: number } | null>(null);
   const [demoMode, setDemoMode] = useState(false);
   const [demoWatchEntry, setDemoWatchEntry] = useState<{ progress: number; resumeSeconds?: number } | null>(null);
@@ -108,11 +102,6 @@ function DetailPage() {
   const [bookmarkPending, setBookmarkPending] = useState(false);
   const [trailerReady, setTrailerReady] = useState(false);
   const watched = watchEntry?.progress === 100;
-
-  useEffect(() => {
-    if (!tmdbId) return;
-    getReminder(tmdbId).then((r) => setIsReminded(!!r));
-  }, [tmdbId]);
 
   useEffect(() => {
     if (!tmdbId) return;
@@ -143,31 +132,6 @@ function DetailPage() {
       toast.error("Failed to update bookmark");
     } finally {
       setBookmarkPending(false);
-    }
-  };
-
-  const handleToggleReminder = async () => {
-    if (isLoadingReminder) return;
-    setIsLoadingReminder(true);
-    try {
-      if (isReminded) {
-        await removeReminder(tmdbId);
-        setIsReminded(false);
-      } else {
-        await setReminder({
-          tmdbId,
-          title,
-          mediaType,
-          releaseDate: detail?.release_date || detail?.first_air_date || "",
-          posterPath: detail?.poster_path ?? null,
-          createdAt: Date.now(),
-        });
-        setIsReminded(true);
-      }
-    } catch {
-      // silently fail
-    } finally {
-      setIsLoadingReminder(false);
     }
   };
 
@@ -392,27 +356,6 @@ function DetailPage() {
                   </svg>
                   {t("detail.comingSoon")}
                 </span>
-                <button
-                  onClick={handleToggleReminder}
-                  disabled={isLoadingReminder}
-                  className="flex items-center gap-2 rounded-full bg-white/10 px-6 py-3 text-sm hover:bg-white/20 disabled:opacity-50"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill={isReminded ? "currentColor" : "none"}
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-                    <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-                  </svg>
-                  {isReminded ? t("detail.reminded") : t("detail.remindMe")}
-                </button>
               </>
             ) : (
               <button
@@ -600,7 +543,7 @@ function DetailPage() {
               <StaggerContainer className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
                 {similar.map((m) => (
                   <motion.div key={m.id} variants={cardVariants}>
-                    <MovieCard movie={m} />
+                    <MovieCard movie={m} showPopover={false} />
                   </motion.div>
                 ))}
               </StaggerContainer>
@@ -614,7 +557,7 @@ function DetailPage() {
               <StaggerContainer className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
                 {recommendations.map((m) => (
                   <motion.div key={m.id} variants={cardVariants}>
-                    <MovieCard movie={m} />
+                    <MovieCard movie={m} showPopover={false} />
                   </motion.div>
                 ))}
               </StaggerContainer>
@@ -664,7 +607,7 @@ function DetailPage() {
         </button>
       )}
 
-      {/* Custom Player */}
+      {/* Embed Player (vidsrc) */}
       {mode === "watch" && (
         <CustomVideoPlayer
           tmdbId={tmdbId}
