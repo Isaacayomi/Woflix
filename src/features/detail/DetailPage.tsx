@@ -543,7 +543,7 @@ function DetailPage() {
               <StaggerContainer className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
                 {similar.map((m) => (
                   <motion.div key={m.id} variants={cardVariants}>
-                    <MovieCard movie={m} showPopover={false} />
+                    <MovieCard movie={m} />
                   </motion.div>
                 ))}
               </StaggerContainer>
@@ -557,7 +557,7 @@ function DetailPage() {
               <StaggerContainer className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
                 {recommendations.map((m) => (
                   <motion.div key={m.id} variants={cardVariants}>
-                    <MovieCard movie={m} showPopover={false} />
+                    <MovieCard movie={m} />
                   </motion.div>
                 ))}
               </StaggerContainer>
