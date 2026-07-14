@@ -14,8 +14,17 @@ function Movies() {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const query = searchParams.get("q") || "";
-  const [genreFilter, setGenreFilter] = useState<number | null>(null);
+  const [genreFilter, setGenreFilterState] = useState<number | null>(() => {
+    const saved = localStorage.getItem("moviesGenre");
+    return saved !== null ? Number(saved) : null;
+  });
   const { movieGenres } = useGenres();
+
+  const setGenreFilter = (id: number | null) => {
+    setGenreFilterState(id);
+    if (id === null) localStorage.removeItem("moviesGenre");
+    else localStorage.setItem("moviesGenre", String(id));
+  };
 
   const {
     movies,

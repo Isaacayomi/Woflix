@@ -23,7 +23,11 @@ function Search() {
     if (isBrowsePage) {
       navigate(raw.trim() ? `/?q=${encodeURIComponent(raw.trim())}` : "/");
     } else {
-      setSearchParams(raw.trim() ? { q: raw } : {});
+      setSearchParams((prev) => {
+        if (raw.trim()) prev.set("q", raw);
+        else prev.delete("q");
+        return prev;
+      });
     }
   };
 

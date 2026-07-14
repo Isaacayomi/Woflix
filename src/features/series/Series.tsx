@@ -14,8 +14,17 @@ function Series() {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const query = searchParams.get("q") || "";
-  const [genreFilter, setGenreFilter] = useState<number | null>(null);
+  const [genreFilter, setGenreFilterState] = useState<number | null>(() => {
+    const saved = localStorage.getItem("seriesGenre");
+    return saved !== null ? Number(saved) : null;
+  });
   const { tvGenres } = useGenres();
+
+  const setGenreFilter = (id: number | null) => {
+    setGenreFilterState(id);
+    if (id === null) localStorage.removeItem("seriesGenre");
+    else localStorage.setItem("seriesGenre", String(id));
+  };
 
   const {
     series,
