@@ -77,7 +77,7 @@ function Navbar() {
             key={item.to}
             to={item.to}
             className={({ isActive }) =>
-              `group/item relative flex items-center justify-center lg:w-full ${isActive ? "text-white" : "text-grayishBlue"} transition-colors duration-200 hover:text-red focus:border-none focus:text-white focus:outline-none`
+              `group/item relative flex items-center justify-center lg:w-full ${isActive ? "text-white" : "text-grayishBlue"} transition-colors duration-200 hover:text-red focus:text-white`
             }
           >
             <NavIcon icon={item.icon} />
@@ -91,7 +91,7 @@ function Navbar() {
       <div className="hidden items-center gap-8 lg:mt-auto lg:flex lg:flex-col lg:pb-12">
         <NavLink
           to="/profile"
-          className="group/item relative flex items-center justify-center lg:w-full text-grayishBlue transition-colors duration-200 hover:text-white focus:outline-none"
+          className="group/item relative flex items-center justify-center lg:w-full text-grayishBlue transition-colors duration-200 hover:text-white"
         >
           <div className="h-[2.5rem] w-[2.5rem] shrink-0 overflow-hidden rounded-full border border-white">
             <img
@@ -108,7 +108,7 @@ function Navbar() {
         <button
           onClick={() => logout()}
           disabled={isPending}
-          className="group/item relative flex items-center justify-center lg:w-full text-grayishBlue transition-colors duration-200 hover:text-red focus:outline-none"
+          className="group/item relative flex items-center justify-center lg:w-full text-grayishBlue transition-colors duration-200 hover:text-red"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

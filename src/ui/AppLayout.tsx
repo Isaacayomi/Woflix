@@ -23,6 +23,7 @@ function AppLayout() {
   const isDetailRoute = pathname.match(/^\/(movie|tv)\/\d+$/);
   const isHome = pathname === "/";
   const isCategoriesLanding = pathname === "/categories";
+  const isProfile = pathname === "/profile";
 
   useEffect(() => {
     if (isDetailRoute) {
@@ -123,7 +124,7 @@ function AppLayout() {
               </div>
 
               <div className="flex min-w-0 items-center justify-center gap-4 md:justify-end">
-                {!isCategoriesLanding && (
+                {!isCategoriesLanding && !isProfile && (
                   <div className="min-w-0 w-full max-w-md lg:max-w-lg">
                     <Search />
                   </div>

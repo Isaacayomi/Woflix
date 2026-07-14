@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  *:focus-visible {
+    @apply outline-none ring-2 ring-red ring-offset-2 ring-offset-darkBlue;
+  }
+}
+
 :root {
   --plyr-color-main: #fc4747;
   --plyr-video-background: #10141e;

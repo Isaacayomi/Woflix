@@ -3,10 +3,10 @@ import { useTranslation } from "react-i18next";
 import type { Movie } from "../../types";
 
 function getImg(movie: Movie): string {
-  return movie.thumbnail?.regular?.small ||
+  return movie.thumbnail?.regular?.large ||
     movie.thumbnail?.regular?.medium ||
-    movie.thumbnail?.trending?.small ||
     movie.thumbnail?.trending?.large ||
+    movie.thumbnail?.trending?.small ||
     "";
 }
 
