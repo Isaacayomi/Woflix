@@ -21,6 +21,7 @@ import { getWatchEntry } from "../../services/apiWatchHistory";
 import MovieCard from "../../ui/MovieCard";
 import SeasonDropdown from "../../ui/SeasonDropdown";
 import Spinner from "../../ui/Spinner";
+import SEO from "../../ui/SEO";
 import CastRow from "./CastRow";
 import EpisodeList from "./EpisodeList";
 import StarRating from "./StarRating";
@@ -194,6 +195,12 @@ function DetailPage() {
 
   return (
     <div className="min-h-screen">
+      <SEO
+        title={`${title}${year ? ` (${year})` : ""}`}
+        description={detail.tagline || detail.overview}
+        image={detail.backdrop_path ? imageUrl(detail.backdrop_path, "w1280") : undefined}
+        type={mediaType === "movie" ? "video.movie" : "video.tv"}
+      />
       {/* Hero */}
       <div className="sticky top-0 z-10 h-screen overflow-hidden bg-darkBlue">
         <img

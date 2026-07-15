@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { getCollection } from "../../services/apiCollections";
@@ -8,6 +8,7 @@ import type { Movie, TMDBMovieResult } from "types";
 import Heading from "../../ui/Heading";
 import MovieCard from "../../ui/MovieCard";
 import Spinner from "../../ui/Spinner";
+import SEO from "../../ui/SEO";
 import StaggerContainer, { cardVariants } from "../../ui/StaggerContainer";
 
 function mapToMovie(item: TMDBMovieResult): Movie {
@@ -33,8 +34,6 @@ function mapToMovie(item: TMDBMovieResult): Movie {
 function CollectionPage() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
-  const [searchParams] = useSearchParams();
-  const name = searchParams.get("name") || "Collection";
   const collectionId = Number(id);
 
   const { data: collection, isPending } = useQuery({
@@ -55,6 +54,11 @@ function CollectionPage() {
 
   return (
     <div className="px-6 pb-12 pt-6 md:px-12">
+      <SEO
+        title={collection.name}
+        description={collection.overview || `Browse the ${collection.name} collection.`}
+        image={collection.backdrop_path ? imageUrl(collection.backdrop_path, "w1280") : undefined}
+      />
       {/* Header */}
       <div
         className="relative mb-8 flex h-48 items-end rounded-xl bg-cover bg-center sm:h-64"
