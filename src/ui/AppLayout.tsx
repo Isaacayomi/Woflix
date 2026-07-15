@@ -51,7 +51,7 @@ function AppLayout() {
         <div className="flex h-full gap-9 px-4 pb-20 lg:px-0 lg:pb-8">
           <Navbar />
 
-          <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-9 pt-8">
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-6 pt-8">
             <header className="sticky top-0 z-10 flex flex-col gap-4 bg-darkBlue md:flex-row md:items-center md:justify-between md:gap-4 lg:gap-8">
               <div className="flex items-center justify-between md:justify-start md:gap-4">
                 <div className="flex items-center gap-4">
