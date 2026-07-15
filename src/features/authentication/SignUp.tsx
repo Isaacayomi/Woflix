@@ -13,6 +13,7 @@ import Button from "../../ui/Button";
 import ErrorMessage from "../../ui/ErrorMessage";
 import SpinnerMini from "../../ui/SpinnerMini";
 import GoogleButton from "../../ui/GoogleButton";
+import SEO from "../../ui/SEO";
 
 function SignUp() {
   const { t } = useTranslation();
@@ -51,6 +52,7 @@ function SignUp() {
 
   return (
     <AuthLayout>
+      <SEO title="Sign Up" description="Create your WòFlix account and start streaming today." />
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="flex w-full flex-col"
