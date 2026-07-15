@@ -4,6 +4,7 @@ import { useWatchProviders } from "../../hooks/useWatchProviders";
 import { imageUrl } from "../../lib/tmdb";
 import Heading from "../../ui/Heading";
 import Spinner from "../../ui/Spinner";
+import SEO from "../../ui/SEO";
 
 const LANGUAGES = [
   { code: "en", name: "English" },
@@ -65,6 +66,7 @@ function CategoriesPage() {
 
   return (
     <div className="px-6 pb-12 pt-6 md:px-12">
+      <SEO title="Browse Categories" description="Explore movies by mood, decade, language, and streaming platform." />
       <Heading>{t("categories.heading")}</Heading>
 
       {/* Moods */}

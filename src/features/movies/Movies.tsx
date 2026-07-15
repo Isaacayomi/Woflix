@@ -7,6 +7,7 @@ import { useGenres } from "../../hooks/useGenres";
 import Heading from "../../ui/Heading";
 import MovieCard from "../../ui/MovieCard";
 import Spinner from "../../ui/Spinner";
+import SEO from "../../ui/SEO";
 import MovieCardSkeleton from "../../ui/skeletons/MovieCardSkeleton";
 import StaggerContainer, { cardVariants } from "../../ui/StaggerContainer";
 
@@ -58,6 +59,7 @@ function Movies() {
 
   return (
     <div className="min-h-full">
+      <SEO title="Movies" description="Browse and discover movies across every genre. Find your next favorite film." />
       {isPending && !movies.length && (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3, 4, 5, 6].map((i) => (

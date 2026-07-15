@@ -6,6 +6,7 @@ import { useDiscoverMovies } from "../../hooks/useDiscoverMovies";
 import Heading from "../../ui/Heading";
 import MovieCard from "../../ui/MovieCard";
 import Spinner from "../../ui/Spinner";
+import SEO from "../../ui/SEO";
 import MovieCardSkeleton from "../../ui/skeletons/MovieCardSkeleton";
 import StaggerContainer, { cardVariants } from "../../ui/StaggerContainer";
 
@@ -50,6 +51,7 @@ function DecadeResults() {
 
   return (
     <div className="px-6 pb-12 pt-6 md:px-12">
+      <SEO title={`${name} Movies`} description={`Browse and discover movies from the ${name}.`} />
       <Heading>{name}</Heading>
 
       {isPending && !movies.length && (

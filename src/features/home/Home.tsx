@@ -14,6 +14,7 @@ import { useRecentlyViewed } from "../../hooks/useRecentlyViewed";
 import { useRecommended } from "../../hooks/useRecommended";
 import Heading from "../../ui/Heading";
 import MovieCard from "../../ui/MovieCard";
+import SEO from "../../ui/SEO";
 import TrendingMovies from "./TrendingMovie";
 import ContinueWatchingCard from "./ContinueWatchingCard";
 import GenreMovieRow from "./GenreMovieRow";
@@ -53,6 +54,7 @@ function Home() {
 
   return (
     <div className="min-h-full">
+      <SEO title={undefined} description="Stream movies and TV shows. Browse trending titles, create your watchlist, and discover what to watch next." />
       {!query && (
         <>
           {heroPending ? (
