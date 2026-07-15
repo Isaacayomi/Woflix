@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { getWatchHistory, removeFromHistory } from "../../services/apiWatchHistory";
 import Heading from "../../ui/Heading";
 import Spinner from "../../ui/Spinner";
+import SEO from "../../ui/SEO";
 import { imageUrl } from "../../lib/tmdb";
 
 function History() {
@@ -23,6 +24,7 @@ function History() {
 
   return (
     <div className="min-h-full px-6 md:px-12">
+      <SEO title="Watch History" description="Your recently watched movies and TV shows." />
       <Heading>{t("history.heading")}</Heading>
 
       {isPending && <Spinner />}

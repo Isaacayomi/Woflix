@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { isAdmin, getAllAdminStats, type AdminStats } from "../../services/apiAdmin";
 import Spinner from "../../ui/Spinner";
+import SEO from "../../ui/SEO";
 
 function Admin() {
   const { t } = useTranslation();
@@ -73,6 +74,7 @@ function Admin() {
 
   return (
     <div className="min-h-screen bg-darkBlue px-6 py-8 text-white md:px-12">
+      <SEO title="Admin Dashboard" description="WòFlix admin dashboard and analytics." />
       <div className="mb-8 flex items-center gap-3">
         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red">
           <line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" />

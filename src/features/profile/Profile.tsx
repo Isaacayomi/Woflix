@@ -18,6 +18,7 @@ import { useUserStats } from "../../hooks/useUserStats";
 import { clearWatchHistory } from "../../services/apiWatchHistory";
 import Heading from "../../ui/Heading";
 import SpinnerMini from "../../ui/SpinnerMini";
+import SEO from "../../ui/SEO";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import i18n from "../../lib/i18n/config";
@@ -289,6 +290,7 @@ function Profile() {
 
   return (
     <div className="px-6 pb-12 pt-6 md:px-12">
+      <SEO title="Profile" description="Manage your WòFlix account settings and preferences." />
       <Heading>{t("profile.heading")}</Heading>
 
       <div className="mx-auto mt-8 max-w-2xl space-y-6">

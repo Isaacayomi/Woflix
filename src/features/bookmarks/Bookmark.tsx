@@ -7,6 +7,7 @@ import { getBookmark } from "../../services/apiBookmark";
 import MovieCard from "../../ui/MovieCard";
 import Heading from "../../ui/Heading";
 import Spinner from "../../ui/Spinner";
+import SEO from "../../ui/SEO";
 import StaggerContainer, { cardVariants } from "../../ui/StaggerContainer";
 
 type Tab = "all" | "movie" | "tv series";
@@ -56,6 +57,7 @@ function Bookmark() {
   if (allBookmarked.length === 0 && !query) {
     return (
       <div className="min-h-full">
+        <SEO title="My List" description="Your saved movies and TV shows." />
         <Heading>{t("bookmarks.heading")}</Heading>
         <div className="mt-16 flex flex-col items-center gap-4 text-center">
           <img
@@ -74,6 +76,7 @@ function Bookmark() {
 
   return (
     <div className="min-h-full">
+      <SEO title="My List" description="Your saved movies and TV shows." />
       {!query ? (
         <Heading>{t("bookmarks.heading")}</Heading>
       ) : (
