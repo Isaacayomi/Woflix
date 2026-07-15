@@ -1,11 +1,11 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
+import { HelmetProvider } from "react-helmet-async";
 import AppLayout from "./ui/AppLayout";
 import Spinner from "./ui/Spinner";
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "react-hot-toast";
-import { useEffect } from "react";
 import i18n from "./lib/i18n/config";
 
 const Home = lazy(() => import("./features/home/Home"));
@@ -41,14 +41,15 @@ function LanguageChangeHandler() {
   return null;
 }
 
-function App() {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        experimental_prefetchInRender: true,
-      },
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      experimental_prefetchInRender: true,
     },
-  });
+  },
+});
+
+function App() {
 
   useEffect(() => {
     const saved = localStorage.getItem("theme");
@@ -60,6 +61,7 @@ function App() {
   }, []);
 
   return (
+    <HelmetProvider>
     <QueryClientProvider client={queryClient}>
       <ReactQueryDevtools initialIsOpen={false} />
 
@@ -92,6 +94,7 @@ function App() {
         </Suspense>
       </BrowserRouter>
     </QueryClientProvider>
+    </HelmetProvider>
   );
 }
 
