@@ -1,6 +1,49 @@
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import { VitePWA } from "vite-plugin-pwa";
+
+function tmdbProxyPlugin(): Plugin {
+  return {
+    name: "tmdb-proxy",
+    configureServer(server) {
+      server.middlewares.use("/api/tmdb", async (req, res) => {
+        const apiKey = server.config.env.VITE_TMDB_API_KEY;
+        if (!apiKey) {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "TMDB API key not configured" }));
+          return;
+        }
+
+        const tmdbPath = req.url?.replace(/^\//, "") || "";
+        const fullUrl = new URL(
+          `https://api.themoviedb.org/3/${tmdbPath}`,
+        );
+
+        const rawParams = req.url?.split("?")[1] || "";
+        const searchParams = new URLSearchParams(rawParams);
+        for (const [key, value] of searchParams.entries()) {
+          fullUrl.searchParams.set(key, value);
+        }
+        fullUrl.searchParams.set("api_key", apiKey);
+
+        try {
+          const response = await fetch(fullUrl.toString());
+          if (!response.ok) {
+            res.writeHead(response.status, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: `TMDB error ${response.status}` }));
+            return;
+          }
+          const data = await response.json();
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify(data));
+        } catch {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "Failed to fetch from TMDB" }));
+        }
+      });
+    },
+  };
+}
 
 export default defineConfig({
   build: {
@@ -16,15 +59,8 @@ export default defineConfig({
       },
     },
   },
-  server: {
-    proxy: {
-      "/api": {
-        target: "http://localhost:3001",
-        changeOrigin: true,
-      },
-    },
-  },
   plugins: [
+    tmdbProxyPlugin(),
     react(),
     VitePWA({
       registerType: "autoUpdate",

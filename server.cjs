@@ -1,9 +1,12 @@
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
+const url = require("url");
 
 const PORT = parseInt(process.env.PORT, 10) || 3001;
 const DIST_DIR = path.join(__dirname, "dist");
+
+require("dotenv").config();
 
 const MIME_TYPES = {
   ".html": "text/html; charset=utf-8",
@@ -70,13 +73,61 @@ function serveIndexHtml(res) {
   });
 }
 
-const server = http.createServer((req, res) => {
+async function proxyTmdbRequest(req, res) {
+  const parsedUrl = url.parse(req.url, true);
+  const tmdbPath = parsedUrl.pathname.replace("/api/tmdb/", "");
+  const apiKey = process.env.VITE_TMDB_API_KEY;
+
+  if (!apiKey) {
+    res.writeHead(500, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ error: "TMDB API key not configured" }));
+    return;
+  }
+
+  const tmdbUrl = new URL(`https://api.themoviedb.org/3/${tmdbPath}`);
+
+  // Forward query params from the client request
+  for (const [key, value] of Object.entries(parsedUrl.query)) {
+    if (typeof value === "string") {
+      tmdbUrl.searchParams.set(key, value);
+    }
+  }
+
+  // Always inject the API key server-side
+  tmdbUrl.searchParams.set("api_key", apiKey);
+
+  try {
+    const response = await fetch(tmdbUrl.toString());
+
+    if (!response.ok) {
+      res.writeHead(response.status, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: `TMDB API error: ${response.status}` }));
+      return;
+    }
+
+    const data = await response.json();
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify(data));
+  } catch (error) {
+    res.writeHead(500, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ error: "Failed to fetch from TMDB" }));
+  }
+}
+
+const server = http.createServer(async (req, res) => {
   if (req.method !== "GET" && req.method !== "HEAD") {
     res.writeHead(405, { "Content-Type": "text/plain; charset=utf-8" });
     res.end("Method Not Allowed");
     return;
   }
+
   const pathname = req.url.indexOf("?") === -1 ? req.url : req.url.slice(0, req.url.indexOf("?"));
+
+  // Handle TMDB proxy requests
+  if (pathname.startsWith("/api/tmdb/")) {
+    return proxyTmdbRequest(req, res);
+  }
+
   const requestedFile = pathname === "/" ? "index.html" : pathname.slice(1);
   serveStatic(res, requestedFile);
 });
