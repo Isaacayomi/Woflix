@@ -5,6 +5,8 @@ import {
   signOut,
   GoogleAuthProvider,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
 } from "firebase/auth";
 import type { AuthProps } from "types";
 
@@ -30,7 +32,29 @@ export async function logoutApi() {
   await signOut(auth);
 }
 
+export function isMobileOrStandalone(): boolean {
+  const isStandalone =
+    window.matchMedia("(display-mode: standalone)").matches ||
+    (window.navigator as unknown as { standalone?: boolean }).standalone ===
+      true;
+  const isMobile =
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent,
+    );
+  return isStandalone || isMobile;
+}
+
 export function googleLoginApi() {
   const provider = new GoogleAuthProvider();
+
+  if (isMobileOrStandalone()) {
+    return signInWithRedirect(auth, provider);
+  }
+
   return signInWithPopup(auth, provider);
+}
+
+export async function handleRedirectResult() {
+  const result = await getRedirectResult(auth);
+  return result;
 }

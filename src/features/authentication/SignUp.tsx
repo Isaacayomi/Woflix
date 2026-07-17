@@ -14,11 +14,16 @@ import ErrorMessage from "../../ui/ErrorMessage";
 import SpinnerMini from "../../ui/SpinnerMini";
 import GoogleButton from "../../ui/GoogleButton";
 import SEO from "../../ui/SEO";
+import { handleRedirectResult } from "../../services/apiAuth";
 
 function SignUp() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { isAuthenticated, isPending: authPending } = useUser();
+
+  useEffect(() => {
+    handleRedirectResult().catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (!authPending && isAuthenticated) {
