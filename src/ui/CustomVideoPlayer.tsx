@@ -112,8 +112,21 @@ export default function CustomVideoPlayer({
     return () => document.removeEventListener("fullscreenchange", onFsChange);
   }, []);
 
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDragStart = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
   return (
-    <div ref={containerRef} className="fixed inset-0 z-[60] flex flex-col bg-black select-none">
+    <div
+      ref={containerRef}
+      className="fixed inset-0 z-[60] flex flex-col bg-black select-none"
+      onContextMenu={handleContextMenu}
+      onDragStart={handleDragStart}
+    >
       <div className="relative z-30 flex items-center gap-3 bg-gradient-to-b from-black/80 to-transparent px-4 py-3">
         <button
           onClick={onClose}

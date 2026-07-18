@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { isAdmin, getAllAdminStats, type AdminStats } from "../../services/apiAdmin";
+import {
+  isAdmin,
+  getAllAdminStats,
+  type AdminStats,
+} from "../../services/apiAdmin";
 import Spinner from "../../ui/Spinner";
 import SEO from "../../ui/SEO";
 
 function Admin() {
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const [checking, setChecking] = useState(true);
   const [authorized, setAuthorized] = useState(false);
@@ -53,12 +55,25 @@ function Admin() {
   if (!authorized) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-darkBlue text-white">
-        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="48"
+          height="48"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="text-red"
+        >
           <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
           <path d="M7 11V7a5 5 0 0 1 10 0v4" />
         </svg>
         <h1 className="text-xl font-semibold">Access Denied</h1>
-        <p className="text-sm text-white/50">You do not have admin privileges.</p>
+        <p className="text-sm text-white/50">
+          You do not have admin privileges.
+        </p>
         <p className="text-xs text-white/30">Redirecting to home...</p>
       </div>
     );
@@ -74,31 +89,59 @@ function Admin() {
 
   return (
     <div className="min-h-screen bg-darkBlue px-6 py-8 text-white md:px-12">
-      <SEO title="Admin Dashboard" description="WòFlix admin dashboard and analytics." />
+      <SEO
+        title="Admin Dashboard"
+        description="WòFlix admin dashboard and analytics."
+      />
       <div className="mb-8 flex items-center gap-3">
-        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red">
-          <line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="28"
+          height="28"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="text-red"
+        >
+          <line x1="18" y1="20" x2="18" y2="10" />
+          <line x1="12" y1="20" x2="12" y2="4" />
+          <line x1="6" y1="20" x2="6" y2="14" />
         </svg>
-        <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+        <h1 className="text-2xl font-bold">Admiin Dashboard</h1>
       </div>
 
       {/* Stats Cards */}
       <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-xl bg-white/5 p-5">
-          <p className="text-xs text-white/40 uppercase tracking-wider">Total Users</p>
+          <p className="text-xs uppercase tracking-wider text-white/40">
+            Total Useers
+          </p>
           <p className="mt-1 text-3xl font-bold">{stats.totalUsers}</p>
         </div>
         <div className="rounded-xl bg-white/5 p-5">
-          <p className="text-xs text-white/40 uppercase tracking-wider">Total Watches</p>
+          <p className="text-xs uppercase tracking-wider text-white/40">
+            Total Watches
+          </p>
           <p className="mt-1 text-3xl font-bold">{stats.totalWatches}</p>
         </div>
         <div className="rounded-xl bg-white/5 p-5">
-          <p className="text-xs text-white/40 uppercase tracking-wider">Countries</p>
-          <p className="mt-1 text-3xl font-bold">{stats.countryBreakdown.length}</p>
+          <p className="text-xs uppercase tracking-wider text-white/40">
+            Countries
+          </p>
+          <p className="mt-1 text-3xl font-bold">
+            {stats.countryBreakdown.length}
+          </p>
         </div>
         <div className="rounded-xl bg-white/5 p-5">
-          <p className="text-xs text-white/40 uppercase tracking-wider">Recent Signups</p>
-          <p className="mt-1 text-3xl font-bold">{stats.recentSignups.length}</p>
+          <p className="text-xs uppercase tracking-wider text-white/40">
+            Recent Signups
+          </p>
+          <p className="mt-1 text-3xl font-bold">
+            {stats.recentSignups.length}
+          </p>
         </div>
       </div>
 
@@ -108,7 +151,7 @@ function Admin() {
         <div className="overflow-x-auto rounded-xl bg-white/5">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-white/10 text-xs text-white/40 uppercase">
+              <tr className="border-b border-white/10 text-xs uppercase text-white/40">
                 <th className="px-4 py-3 font-medium">#</th>
                 <th className="px-4 py-3 font-medium">Title</th>
                 <th className="px-4 py-3 font-medium">Category</th>
@@ -117,10 +160,15 @@ function Admin() {
             </thead>
             <tbody>
               {stats.popularContent.map((item, i) => (
-                <tr key={item.title} className="border-b border-white/5 hover:bg-white/5">
+                <tr
+                  key={item.title}
+                  className="border-b border-white/5 hover:bg-white/5"
+                >
                   <td className="px-4 py-3 text-white/40">{i + 1}</td>
                   <td className="px-4 py-3 font-medium">{item.title}</td>
-                  <td className="px-4 py-3 text-white/60 capitalize">{item.category}</td>
+                  <td className="px-4 py-3 capitalize text-white/60">
+                    {item.category}
+                  </td>
                   <td className="px-4 py-3">
                     <span className="rounded-full bg-red/20 px-2.5 py-0.5 text-xs font-medium text-red">
                       {item.count}
@@ -130,7 +178,12 @@ function Admin() {
               ))}
               {stats.popularContent.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="px-4 py-8 text-center text-white/30">No watch data yet.</td>
+                  <td
+                    colSpan={4}
+                    className="px-4 py-8 text-center text-white/30"
+                  >
+                    No watch data yet.
+                  </td>
                 </tr>
               )}
             </tbody>
@@ -145,7 +198,7 @@ function Admin() {
           <div className="overflow-x-auto rounded-xl bg-white/5">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-white/10 text-xs text-white/40 uppercase">
+                <tr className="border-b border-white/10 text-xs uppercase text-white/40">
                   <th className="px-4 py-3 font-medium">Country</th>
                   <th className="px-4 py-3 font-medium">Users</th>
                   <th className="px-4 py-3 font-medium">%</th>
@@ -153,19 +206,28 @@ function Admin() {
               </thead>
               <tbody>
                 {stats.countryBreakdown.map((item) => (
-                  <tr key={item.country} className="border-b border-white/5 hover:bg-white/5">
+                  <tr
+                    key={item.country}
+                    className="border-b border-white/5 hover:bg-white/5"
+                  >
                     <td className="px-4 py-3 font-medium">{item.country}</td>
                     <td className="px-4 py-3">{item.count}</td>
                     <td className="px-4 py-3 text-white/50">
                       {stats.totalUsers > 0
                         ? ((item.count / stats.totalUsers) * 100).toFixed(1)
-                        : "0"}%
+                        : "0"}
+                      %
                     </td>
                   </tr>
                 ))}
                 {stats.countryBreakdown.length === 0 && (
                   <tr>
-                    <td colSpan={3} className="px-4 py-8 text-center text-white/30">No user data yet.</td>
+                    <td
+                      colSpan={3}
+                      className="px-4 py-8 text-center text-white/30"
+                    >
+                      No user data yet.
+                    </td>
                   </tr>
                 )}
               </tbody>
@@ -179,7 +241,7 @@ function Admin() {
           <div className="overflow-x-auto rounded-xl bg-white/5">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-white/10 text-xs text-white/40 uppercase">
+                <tr className="border-b border-white/10 text-xs uppercase text-white/40">
                   <th className="px-4 py-3 font-medium">Email</th>
                   <th className="px-4 py-3 font-medium">Country</th>
                   <th className="px-4 py-3 font-medium">Date</th>
@@ -187,15 +249,27 @@ function Admin() {
               </thead>
               <tbody>
                 {stats.recentSignups.map((user) => (
-                  <tr key={user.uid} className="border-b border-white/5 hover:bg-white/5">
-                    <td className="px-4 py-3 font-medium truncate max-w-[200px]">{user.email}</td>
+                  <tr
+                    key={user.uid}
+                    className="border-b border-white/5 hover:bg-white/5"
+                  >
+                    <td className="max-w-[200px] truncate px-4 py-3 font-medium">
+                      {user.email}
+                    </td>
                     <td className="px-4 py-3 text-white/60">{user.country}</td>
-                    <td className="px-4 py-3 text-white/50 text-xs">{user.createdAt}</td>
+                    <td className="px-4 py-3 text-xs text-white/50">
+                      {user.createdAt}
+                    </td>
                   </tr>
                 ))}
                 {stats.recentSignups.length === 0 && (
                   <tr>
-                    <td colSpan={3} className="px-4 py-8 text-center text-white/30">No signups yet.</td>
+                    <td
+                      colSpan={3}
+                      className="px-4 py-8 text-center text-white/30"
+                    >
+                      No signups yet.
+                    </td>
                   </tr>
                 )}
               </tbody>

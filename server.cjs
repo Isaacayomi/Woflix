@@ -38,6 +38,16 @@ function getContentType(filePath) {
   return MIME_TYPES[path.extname(filePath).toLowerCase()] || "application/octet-stream";
 }
 
+function setSecurityHeaders(res) {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader(
+    "Content-Security-Policy",
+    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' https://image.tmdb.org https://*.googleusercontent.com data:; font-src 'self'; connect-src 'self' https://api.themoviedb.org https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://www.googleapis.com https://ipinfo.io; frame-src https://vidsrc.me https://*.vidsrc.me; frame-ancestors 'self';"
+  );
+}
+
 function serveStatic(res, filePath) {
   const fullPath = path.join(DIST_DIR, filePath);
   const resolved = path.resolve(fullPath);
@@ -115,6 +125,8 @@ async function proxyTmdbRequest(req, res) {
 }
 
 const server = http.createServer(async (req, res) => {
+  setSecurityHeaders(res);
+
   if (req.method !== "GET" && req.method !== "HEAD") {
     res.writeHead(405, { "Content-Type": "text/plain; charset=utf-8" });
     res.end("Method Not Allowed");
